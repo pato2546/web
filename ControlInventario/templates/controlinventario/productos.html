@@ -1,0 +1,104 @@
+<!-- templates/controlinventario/productos.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .bg-stock-bajo {
+            background-color: rgba(255, 204, 204, 0.5);  /* Rojo claro */
+            color: #000;  /* Texto negro para mejor contraste */
+        }
+
+        body {
+            padding-top: 70px; /* Espacio para que el contenido no quede detrás del menú */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo de la Aplicación" class="img-fluid" style="max-height: 50px;"> <!-- Ajusta el tamaño de la imagen según sea necesario -->
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'carro' %}">Carro</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <h1 class="text-center">Lista de Productos</h1>
+
+        <div class="search-container mb-4">
+            <form method="GET" action="{% url 'productos_view' %}" class="form-inline">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" placeholder="Buscar productos..." value="{{ query }}">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th class="text-center">Stock</th> <!-- Centrar encabezado de la columna -->
+                    <th>Fecha de Creación</th>
+                    <th>Fecha de Actualización</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.descripcion }}</td>
+                        <td class="text-center {% if producto.stock < 3 %}bg-stock-bajo{% endif %}">
+                            {% if producto.stock < 3 %}
+                                <span class="font-weight-bold">{{ producto.stock }}</span>
+                            {% else %}
+                                {{ producto.stock }}
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.fecha_creacion|date:"d/m/Y H:i:s" }}</td>
+                        <td>{{ producto.fecha_actualizacion|date:"d/m/Y H:i:s" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay productos disponibles.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

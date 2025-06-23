@@ -1,0 +1,62 @@
+body {
+    background-color: #f0f8ff; /* Color de fondo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.login-container {
+    background-color: white;
+    padding: 1.5rem;  /* Reduce el padding */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 1%;
+    max-width: 1px; /* Cambia a un tamaño más angosto */
+}
+
+.login-container h1 {
+    margin-bottom: 1.5rem;
+    font-size: 14px; /* Ajusta el tamaño del título */
+    text-align: center;
+    color: #333; /* Color para el título */
+}
+
+.form-group label {
+    font-weight: bold; /* Etiquetas en negrita */
+    color: #333; /* Color de etiquetas */
+}
+
+.form-control {
+    border: 1px solid #007bff; /* Color de borde */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+.form-control:focus {
+    border-color: #0056b3; /* Color del borde al hacer foco */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra de foco */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Color del botón */
+    border: none;
+    font-weight: bold; /* Botón en negrita */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Color del botón al pasar el ratón */
+}
+.footer {
+    background-color: #007bff; /* Color azul */
+    color: white; /* Texto en blanco */
+    padding: 1rem 0; /* Espaciado vertical */
+    position: relative; /* Asegúrate de que esté siempre al final */
+    bottom: 0; /* En el fondo */
+    width: 100%; /* Ancho completo */
+}
+
+.footer p {
+    margin: 0; /* Sin margen para el párrafo */
+}
