@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from flask import app, render_template
 import pandas as pd
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from ControlInventarioColegio import settings
 from .models import Pedido, Producto
+
+
 
 # Vista para inicio de sesión
 def login_view(request):
@@ -25,7 +28,7 @@ def login_view(request):
             return redirect('home')  # Redirige a la vista 'home' después del login
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
-    return render(request, 'controlinventario/index.html')
+    return render(request, 'controlinventario/login.html')
 
 # Vista para cambiar contraseña
 @login_required
