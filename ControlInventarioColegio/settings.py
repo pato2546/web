@@ -75,16 +75,6 @@ WSGI_APPLICATION = 'ControlInventarioColegio.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'colegioinventario',
-        'USER': 'luiscorrea',
-        'PASSWORD': 'Admin2025#',
-        'HOST': 'localhost',  # O la dirección IP de tu servidor
-        'PORT': '5432',       # El puerto usual de PostgreSQL
-    }
-}
 
 
 # Password validation
