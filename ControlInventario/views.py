@@ -28,7 +28,7 @@ def login_view(request):
             return redirect('home')  # Redirige a la vista 'home' después del login
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
-    return render(request, 'controlinventario/login.html')
+    return render(request, 'controlinventario/index.html')
 
 # Vista para cambiar contraseña
 @login_required
