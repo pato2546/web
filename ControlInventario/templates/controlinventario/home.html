@@ -8,9 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Cargar el CSS común -->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet"> <!-- Asegúrate de que esta ruta sea correcta -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -21,41 +20,28 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'productos_view' %}">Productos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
-                    </li>
-                    {% if user.is_staff %} 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'autorizar_pedido' %}">Autorizar pedido</a>
-                        </li>
-                    {% endif %} 
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'productos_view' %}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a></li>
+                    {% if user.is_staff %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'autorizar_pedido' %}">Autorizar pedido</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a></li>
                 </ul>
             </div>
         </nav>
     </header>
     
-    <div class="container mt-5">
-        <h1 class="text-center">Bienvenidos a Nuestro Control de Insumos</h1>
-        
-        <!-- Imagen ajustada -->
-        <div class="text-center mb-4">
-            <img src="{% static 'imagenes/pngtree.png' %}" alt="Descripción de la imagen" class="img-fluid" style="max-width: 50%; height: auto;">
+    <div class="container mt-5 pt-5">
+        <div class="text-center">
+            <h1>Bienvenidos a Nuestro Control de Insumos</h1>
+            <div class="text-center mb-4">
+                <img src="{% static 'imagenes/pngtree.png' %}" alt="Descripción de la imagen" class="img-fluid" style="max-width: 50%; height: auto;">
+            </div>
+            <p>Explora nuestros productos y servicios.</p>
         </div>
-
-        <p class="text-center">Explora nuestros productos y servicios.</p>
     </div>
 
     <!-- Pie de página -->
@@ -65,7 +51,7 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS and dependencies -->
+    <!-- Scripts de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
