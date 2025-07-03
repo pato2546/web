@@ -1,4 +1,5 @@
 <!-- templates/controlinventario/hacer_pedido.html -->
+ 
 {% load static %}
 
 <!DOCTYPE html>
@@ -9,11 +10,9 @@
     <title>Hacer Pedido</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding-top: 70px;  /* Ajuste para evitar que el contenido quede detrás del menú fijo */
-        }
-    </style>
+    <!-- Cargar el CSS común -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet"> <!-- Asegúrate de que esta ruta sea correcta -->
+    
 </head>
 <body>
     <header>

@@ -1,25 +1,21 @@
 body {
     background-color: #f0f8ff; /* Color de fondo */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
     font-family: Arial, sans-serif;
 }
 
 .login-container {
     background-color: white;
-    padding: 1.5rem;  /* Reduce el padding */
+    padding: 2rem; /* Aumentar el padding para un mejor espaciado */
     border-radius: 10px; /* Bordes redondeados */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 1%;
-    max-width: 1px; /* Cambia a un tamaño más angosto */
+    width: 90%; /* Usar un 90% del ancho disponible */
+    max-width: 400px; /* Limitar el ancho máximo */
 }
 
 .login-container h1 {
     margin-bottom: 1.5rem;
-    font-size: 14px; /* Ajusta el tamaño del título */
+    font-size: 1.5rem; /* Ajusta el tamaño del título usando rem */
     text-align: center;
     color: #333; /* Color para el título */
 }
@@ -48,15 +44,26 @@ body {
 .btn-primary:hover {
     background-color: #0056b3; /* Color del botón al pasar el ratón */
 }
+
 .footer {
     background-color: #007bff; /* Color azul */
     color: white; /* Texto en blanco */
     padding: 1rem 0; /* Espaciado vertical */
     position: relative; /* Asegúrate de que esté siempre al final */
-    bottom: 0; /* En el fondo */
     width: 100%; /* Ancho completo */
 }
 
 .footer p {
     margin: 0; /* Sin margen para el párrafo */
+}
+
+/* Estilos Adicionales para Responsividad */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1.5rem; /* Ajustar el padding en pantallas más pequeñas */
+    }
+    
+    .login-container h1 {
+        font-size: 1.2rem; /* Ajustar aún más el título en dispositivos pequeños */
+    }
 }

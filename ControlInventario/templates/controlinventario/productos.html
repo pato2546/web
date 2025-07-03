@@ -1,4 +1,5 @@
 <!-- templates/controlinventario/productos.html -->
+ 
 {% load static %}
 
 <!DOCTYPE html>
@@ -9,16 +10,8 @@
     <title>Productos</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .bg-stock-bajo {
-            background-color: rgba(255, 204, 204, 0.5);  /* Rojo claro */
-            color: #000;  /* Texto negro para mejor contraste */
-        }
-
-        body {
-            padding-top: 70px; /* Espacio para que el contenido no quede detrás del menú */
-        }
-    </style>
+    <!-- Cargar el CSS común -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet"> <!-- Asegúrate de que esta ruta sea correcta -->
 </head>
 <body>
     <header>

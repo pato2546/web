@@ -1,13 +1,33 @@
+<!-- templates/controlinventario/rechazo_pedido.html -->
+
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pedido Rechazado</title>
+    <!-- Incluyendo Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Cargar el CSS común -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet"> <!-- Asegúrate de que esta ruta sea correcta -->
+
 </head>
 <body>
-    <h1>Hola {{ pedido.usuario.username }},</h1>
-    <p>Tu pedido para el producto <strong>{{ pedido.producto.nombre }}</strong> ha sido rechazado.</p>
-    <p>Motivo de rechazo: <strong>{{ motivo }}</strong></p>
-    <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+    <div class="container mt-5">
+        <h1 class="text-danger text-center mb-4">Hola {{ pedido.usuario.username }},</h1>
+        <div class="alert alert-warning">
+            <p>Tu pedido para el producto <strong>{{ pedido.producto.nombre }}</strong> ha sido rechazado.</p>
+            <p>Motivo de rechazo: <strong>{{ motivo }}</strong></p>
+            <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+        </div>
+        <p class="text-center">******* Saludos *******</p>
+    </div>
+
+    <!-- Incluyendo Bootstrap JS y dependencias -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
