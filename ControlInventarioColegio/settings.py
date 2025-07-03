@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv() 
@@ -30,8 +31,7 @@ SECRET_KEY = 'django-insecure-liya6!nd&&grnf3a@gu(n3es2ost+zpgl5#9mx2w0tr25zcscn
 DEBUG = False
 
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['con-inver-cole-05b6c25c0f3d.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -138,12 +138,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'colegioinventario'),
-        'USER': os.environ.get('DB_USER', 'luiscorrea'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,  # Opcional: asocia una conexión persistente
+        ssl_require=True   # Requerido por Heroku en conexión segura
+    )
 }
