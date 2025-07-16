@@ -192,7 +192,7 @@ def confirmar_pedido(request):
             subject,
             message_admin,
             settings.EMAIL_HOST_USER,
-            ['pedidos@colegioconstitucion.cl'],
+            ['colegioconstitucion.pedido@gmail.com'],
             fail_silently=False,
         )
 
