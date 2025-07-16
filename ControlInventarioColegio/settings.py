@@ -129,8 +129,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'pedidos@colegioconstitucion.cl'  # Reemplaza con tu correo electrónico
-EMAIL_HOST_PASSWORD = 'pedidoscc2025'  
+EMAIL_HOST_USER = 'colegioconstitucion.pedido@gmail.com'  # Reemplaza con tu correo electrónico
+EMAIL_HOST_PASSWORD = 'Admin2025'  
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
