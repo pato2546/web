@@ -1,0 +1,8 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>{% block header %}{{ title }}{% endblock %}</h1>
+    <a href="{% url 'home' %}">Ver el sitio</a>  <!-- Enlace a tu vista home -->
+    {% block result_count %}{% endblock %}
+    {% block after_title %}{% endblock %}
+{% endblock %}
