@@ -26,12 +26,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Inicio</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                    </li>
+                    {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hacer_pedido' %}">Volver a Seleccionar</a>
                     </li>
@@ -62,11 +64,18 @@
                         </tr>
                     {% empty %}
                         <tr>
-                             <td colspan="3" class="text-center">No hay artículos en el carrito.</td>
+                            <td colspan="3" class="text-center">No hay artículos en el carrito.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- Nuevo: Motivo de la solicitud (opcional) -->
+            <div class="form-group">
+                <label for="motivo_pedido">Motivo de la solicitud (opcional):</label>
+                <textarea id="motivo_pedido" name="motivo_pedido" class="form-control" rows="4" placeholder="Escribe aquí el motivo del pedido..."></textarea>
+            </div>
+
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
                 <a href="{% url 'hacer_pedido' %}" class="btn btn-secondary">Volver a Seleccionar</a>

@@ -172,7 +172,8 @@ def crear_pedido(request):
 def confirmar_pedido(request):
     if request.method == 'POST':
         productos_seleccionados = request.session.get('productos_seleccionados', [])
-        
+        motivo = request.POST.get('motivo_pedido', '').strip()
+
         if not productos_seleccionados:
             messages.error(request, 'No se han seleccionado productos.')
             return redirect('hacer_pedido')
@@ -184,9 +185,14 @@ def confirmar_pedido(request):
             pedido.save()
             lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
 
-        # Enviar email al administrador para autorizar el pedido
+        # Enviar email al administrador con el motivo
         subject = 'Solicitud de Autorización de Pedido'
-        message_admin = f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\nDetalles del pedido:\n' + "\n".join(lista_pedidos)
+        message_admin = (
+            f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
+            f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
+        )
+        if motivo:
+            message_admin += f"\nMotivo de la solicitud:\n{motivo}"
 
         send_mail(
             subject,

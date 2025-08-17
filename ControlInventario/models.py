@@ -28,6 +28,7 @@ class Pedido(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     autorizado = models.BooleanField(default=False)  # Campo agregado para autorización
     motivo_rechazo = models.TextField(null=True, blank=True)  # Campo para almacenar el motivo de rechazo
-
+    
+    
     def __str__(self):
         return f"{self.usuario.username} - {self.producto.nombre} - {self.cargo} - {self.cantidad}"
