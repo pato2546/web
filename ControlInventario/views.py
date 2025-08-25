@@ -125,7 +125,7 @@ def realizar_pedido(request):
     productos = Producto.objects.all().order_by('nombre')
     return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
 
-# Vista del carro de compras
+# 1) Vista del carro de compras
 @login_required
 def carro_view(request):
     # Lee la lista de la sesión (si ya está guardada)
@@ -135,31 +135,19 @@ def carro_view(request):
         action = request.POST.get('action')
         remove_id = request.POST.get('remove_id')
 
+        # Eliminación: solo actualiza la sesión
         if action == 'remove' and remove_id:
             new_list = [p for p in productos_seleccionados if str(p.get('id')) != str(remove_id)]
             request.session['productos_seleccionados'] = new_list
             productos_seleccionados = new_list
-        else:
-            # Opcional: procesar desde el formulario de hacer_pedido si llega una lista nueva
-            seleccionados = []
-            for key in request.POST:
-                if key.startswith('producto_') and request.POST.get(key):
-                    producto_id = key.split('_')[1]
-                    cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
-                    if cantidad <= 0:
-                        continue
-                    try:
-                        producto = Producto.objects.get(id=producto_id)
-                    except Producto.DoesNotExist:
-                        continue
-                    if cantidad > producto.stock:
-                        messages.error(request, f"No hay suficiente stock para {producto.nombre}.")
-                        return redirect('hacer_pedido')
-                    seleccionados.append({'id': producto.id, 'nombre': producto.nombre, 'descripcion': producto.descripcion, 'cantidad': cantidad})
 
-            if seleccionados:
-                request.session['productos_seleccionados'] = seleccionados
-                productos_seleccionados = seleccionados
+            # Feedback opcional al usuario
+            messages.success(request, 'Artículo eliminado del carrito.')
+            # Importante: NO crear pedidos aquí
+        else:
+            # NO procesamos nuevos ítems aquí para evitar crear pedidos accidentalmente
+            # Si necesitas sincronizar desde otra vista, hazlo allí (ruta separada)
+            pass
 
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
@@ -201,46 +189,64 @@ def crear_pedido(request):
     productos = Producto.objects.all()
     return render(request, 'controlinventario/crear_pedido.html', {'productos': productos})
 
-# Vista para confirmar el pedido
+# 2) Vista para confirmar el pedido
 @login_required
 def confirmar_pedido(request):
-    if request.method == 'POST':
-        productos_seleccionados = request.session.get('productos_seleccionados', [])
-        motivo = request.POST.get('motivo_pedido', '').strip()
+    if request.method != 'POST':
+        return redirect('hacer_pedido')  # o la ruta que uses para hacer_pedido
 
-        if not productos_seleccionados:
-            messages.error(request, 'No se han seleccionado productos.')
-            return redirect('hacer_pedido')
+    productos_seleccionados = request.session.get('productos_seleccionados', [])
+    motivo = request.POST.get('motivo_pedido', '').strip()
 
-        lista_pedidos = []
-        for producto_info in productos_seleccionados:
+    if not productos_seleccionados:
+        messages.error(request, 'No se han seleccionado productos.')
+        return redirect('hacer_pedido')
+
+    # Opción A: Crear un Pedido por ítem
+    lista_pedidos = []
+    for producto_info in productos_seleccionados:
+        try:
             producto = Producto.objects.get(id=producto_info['id'])
-            pedido = Pedido(usuario=request.user, producto=producto, cantidad=producto_info['cantidad'], autorizado=False)
-            pedido.save()
-            lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
+        except Producto.DoesNotExist:
+            continue
 
-        # Enviar email al administrador con el motivo
-        subject = 'Solicitud de Autorización de Pedido'
-        message_admin = (
-            f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
-            f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
+        pedido = Pedido(
+            usuario=request.user,
+            producto=producto,
+            cantidad=producto_info['cantidad'],
+            autorizado=False
         )
-        if motivo:
-            message_admin += f"\nMotivo de la solicitud:\n{motivo}"
+        pedido.save()
+        lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
 
-        send_mail(
-            subject,
-            message_admin,
-            settings.EMAIL_HOST_USER,
-            ['pedidocolegio@gmail.com'],
-            fail_silently=False,
-        )
+    # Opción B (si tu modelo es Pedido con items)
+    # from .models import Pedido, PedidoItem
+    # pedido = Pedido.objects.create(usuario=request.user, motivo=motivo, autorizado=False)
+    # for producto_info in productos_seleccionados:
+    #     producto = Producto.objects.get(id=producto_info['id'])
+    #     PedidoItem.objects.create(pedido=pedido, producto=producto, cantidad=producto_info['cantidad'])
+    # lista_pedidos = [f'{p["nombre"]} (Cantidad: {p["cantidad"]})' for p in productos_seleccionados]
 
-        messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
-        request.session['productos_seleccionados'] = []
-        return redirect('pedidos')
+    subject = 'Solicitud de Autorización de Pedido'
+    message_admin = (
+        f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
+        f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
+    )
+    if motivo:
+        message_admin += f"\nMotivo de la solicitud:\n{motivo}"
 
-    return redirect('hacer_pedido')
+    send_mail(
+        subject,
+        message_admin,
+        settings.EMAIL_HOST_USER,
+        ['pedidocolegio@gmail.com'],  # ajusta destinatario
+        fail_silently=False,
+    )
+
+    messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+    # Limpiar el carrito tras confirmar
+    request.session['productos_seleccionados'] = []
+    return redirect('pedidos')
 
 # Vista para exportar pedidos a Excel
 @login_required
