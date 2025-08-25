@@ -129,7 +129,18 @@ def realizar_pedido(request):
 @login_required
 def carro_view(request):
     productos_seleccionados = request.session.get('productos_seleccionados', [])
-    return render(request, 'controlinventario/carrito.html', {'productos_seleccionados': productos_seleccionados})
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        remove_id = request.POST.get('remove_id')
+        if action == 'remove' and remove_id:
+            new_list = [p for p in productos_seleccionados if str(p.get('id')) != str(remove_id)]
+            request.session['productos_seleccionados'] = new_list
+            productos_seleccionados = new_list
+
+    return render(request, 'controlinventario/carrito.html', {
+        'productos_seleccionados': productos_seleccionados
+    })
 
 # Vista para crear un nuevo pedido
 @login_required
