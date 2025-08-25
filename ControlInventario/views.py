@@ -122,7 +122,7 @@ def realizar_pedido(request):
 
         return render(request, 'controlinventario/carrito.html', {'productos_seleccionados': productos_seleccionados})
 
-    productos = Producto.objects.all()
+    productos = Producto.objects.all().order_by('nombre')
     return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
 
 # Vista del carro de compras
