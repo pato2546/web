@@ -5,99 +5,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacer Pedido</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Cargar el CSS común -->
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet"> <!-- Asegúrate de que esta ruta sea correcta -->
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hacer Pedido</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <style>
+    /* Ajuste base para evitar solapamiento con la navbar fija */
+    body {
+      padding-top: 70px; /* altura de tu navbar fija; ajusta si es necesario */
+    }
+    /* Contenedor de la tabla con scroll y altura definida */
+    .tabla-scroll {
+      max-height: 60vh; /* altura de la zona de la tabla al hacer scroll */
+      overflow: auto;
+    }
+    /* Encabezados fijos dentro del contenedor de scroll */
+    thead.thead-fijo th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: #343a40;
+      color: white;
+    }
+    /* Botón superior sticky dentro del flujo (no de la ventana) */
+    .boton-superior-sticky {
+      position: sticky;
+      top: 0; /* ajusta si quieres que aparezca pegado a la parte superior de la ventana o del contenedor */
+      z-index: 5;
+      background: white;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-            <a class="navbar-brand" href="#">
-                <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo de la Aplicación" class="img-fluid" style="max-height: 50px;"> <!-- Ajusta el tamaño de la imagen según sea necesario -->
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Inicio</a>
-                    </li>
-                    {% if user.is_staff %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'carro' %}">Carro</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                    </li>
-                </ul>
-            </div>
-            
-        </nav>
-    </header>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+      <a class="navbar-brand" href="#">
+        <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo" class="img-fluid" style="max-height: 50px;">
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
+          {% if user.is_staff %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'carro' %}">Carro</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
 
-    <div class="container mt-2">
-        <h1 class="text-center mb-3">Hacer Pedido</h1>
+  <main class="container mt-3">
+    <h1 class="text-center mb-3">Hacer Pedido</h1>
 
-        <form method="POST" class="mt-4">
-            {% csrf_token %}
-
-            <div class="d-flex justify-content-end mb-2">
-                <button type="submit" class="btn btn-primary">Enviar a Carro</button>
-            </div>
-
-            <table class="table table-striped table-bordered">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Seleccionar</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Stock Disponible</th>
-                        <th>Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for productos_view in productos %}
-                        <tr>
-                            <td><input type="checkbox" name="producto_{{ productos_view.id }}"></td>
-                            <td>{{ productos_view.nombre }}</td>
-                            <td>{{ productos_view.descripcion }}</td>
-                            <td>{{ productos_view.stock }}</td>
-                            <td>
-                                <input type="number" class="form-control" name="cantidad_{{ productos_view.id }}" min="1" max="{{ productos_view.stock }}" value="1" required>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center">No hay productos disponibles.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button type="submit" class="btn btn-primary">Enviar a Carro</button>
+    <!-- Contenedor principal con scroll para la tabla y el botón superior -->
+    <div class="tabla-scroll border rounded p-2" style="position: relative;">
+      <!-- Botón superior sticky dentro del contenedor -->
+      <div class="boton-superior-sticky d-flex justify-content-end mb-2">
+        <form method="POST" style="margin: 0;">
+          {% csrf_token %}
+          <!-- Este botón envía el formulario del pedido; si prefieres que sea otro formulario, ajústalo -->
+          <button type="submit" class="btn btn-primary" formaction="." formmethod="post">Enviar a Carro</button>
         </form>
+      </div>
 
-        {% if messages %}
-        <div class="alert alert-info mt-4">
-            {% for message in messages %}
-                <div class="{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
+      <table class="table table-striped table-bordered">
+        <thead class="thead-dark head-fixed" style="position: sticky; top: 0; z-index: 4;">
+          <tr>
+            <th>Seleccionar</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Stock Disponible</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for productos_view in productos %}
+          <tr>
+            <td><input type="checkbox" name="producto_{{ productos_view.id }}"></td>
+            <td>{{ productos_view.nombre }}</td>
+            <td>{{ productos_view.descripcion }}</td>
+            <td>{{ productos_view.stock }}</td>
+            <td>
+              <input type="number" class="form-control" name="cantidad_{{ productos_view.id }}" min="1" max="{{ productos_view.stock }}" value="1" required>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center">No hay productos disponibles.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% if messages %}
+    <div class="alert alert-info mt-3">
+      {% for message in messages %}
+        <div class="{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>  
+</html>
