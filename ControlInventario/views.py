@@ -94,7 +94,6 @@ def pedidos_view(request):
     }
     return render(request, 'controlinventario/pedidos.html', context)
 
-# Vista para realizar pedidos
 @login_required
 def realizar_pedido(request):
     if request.method == 'POST':
@@ -103,25 +102,35 @@ def realizar_pedido(request):
         for key in request.POST:
             if key.startswith('producto_'):
                 producto_id = key.split('_')[1]
-                cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
+                try:
+                    cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
+                except (ValueError, TypeError):
+                    cantidad = 0
 
                 if cantidad > 0:
-                    producto = Producto.objects.get(id=producto_id)
+                    try:
+                        producto = Producto.objects.get(id=producto_id)
+                    except Producto.DoesNotExist:
+                        continue
 
                     if cantidad > producto.stock:
                         messages.error(request, f"No hay suficiente stock para {producto.nombre}. Stock disponible: {producto.stock}.")
                         return redirect('hacer_pedido')
-                    
-                    # Opción 1: Usar diccionario
-                    productos_seleccionados.append({'id': producto.id, 'nombre': producto.nombre, 'descripcion': producto.descripcion, 'cantidad': cantidad})
 
-                    # Opción 2: Usar una lista de tuplas
-                    # productos_seleccionados.append(({'nombre': producto.nombre, 'descripcion': producto.descripcion}, cantidad))
-        
+                    productos_seleccionados.append({
+                        'id': producto.id,
+                        'nombre': producto.nombre,
+                        'descripcion': producto.descripcion,
+                        'cantidad': cantidad
+                    })
+
+        # Guardar en sesión
         request.session['productos_seleccionados'] = productos_seleccionados
 
-        return render(request, 'controlinventario/carrito.html', {'productos_seleccionados': productos_seleccionados})
+        # Redirigir al carrito para evitar reenvío de formulario
+        return redirect('carro')  # Asegúrate que la URL 'carro' esté registrada
 
+    # GET: mostrar formulario de hacer_pedido
     productos = Producto.objects.all().order_by('nombre')
     return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
 
