@@ -128,15 +128,38 @@ def realizar_pedido(request):
 # Vista del carro de compras
 @login_required
 def carro_view(request):
+    # Lee la lista de la sesión (si ya está guardada)
     productos_seleccionados = request.session.get('productos_seleccionados', [])
 
     if request.method == 'POST':
         action = request.POST.get('action')
         remove_id = request.POST.get('remove_id')
+
         if action == 'remove' and remove_id:
             new_list = [p for p in productos_seleccionados if str(p.get('id')) != str(remove_id)]
             request.session['productos_seleccionados'] = new_list
             productos_seleccionados = new_list
+        else:
+            # Opcional: procesar desde el formulario de hacer_pedido si llega una lista nueva
+            seleccionados = []
+            for key in request.POST:
+                if key.startswith('producto_') and request.POST.get(key):
+                    producto_id = key.split('_')[1]
+                    cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
+                    if cantidad <= 0:
+                        continue
+                    try:
+                        producto = Producto.objects.get(id=producto_id)
+                    except Producto.DoesNotExist:
+                        continue
+                    if cantidad > producto.stock:
+                        messages.error(request, f"No hay suficiente stock para {producto.nombre}.")
+                        return redirect('hacer_pedido')
+                    seleccionados.append({'id': producto.id, 'nombre': producto.nombre, 'descripcion': producto.descripcion, 'cantidad': cantidad})
+
+            if seleccionados:
+                request.session['productos_seleccionados'] = seleccionados
+                productos_seleccionados = seleccionados
 
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
