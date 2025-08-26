@@ -99,41 +99,31 @@ def realizar_pedido(request):
     if request.method == 'POST':
         productos_seleccionados = []
 
-        for key, value in request.POST.items():
-            if key.startswith('producto_'):
+        for key in request.POST:
+            if key.startswith('producto_'):  # Detectar productos seleccionados
                 producto_id = key.split('_')[1]
-                try:
-                    cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
-                except (ValueError, TypeError):
-                    cantidad = 0
+                cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
 
                 if cantidad > 0:
-                    try:
-                        producto = Producto.objects.get(id=producto_id)
-                    except Producto.DoesNotExist:
-                        continue
-
-                    if cantidad > producto.stock:
-                        messages.error(request, f"No hay suficiente stock para {producto.nombre}. Stock disponible: {producto.stock}.")
-                        return redirect('hacer_pedido')
-
-                    productos_seleccionados.append({
+                    # Recuperar producto completo
+                    producto = Producto.objects.get(id=producto_id)
+                    producto_info = {
                         'id': producto.id,
                         'nombre': producto.nombre,
                         'descripcion': producto.descripcion,
-                        'cantidad': cantidad
-                    })
+                    }
+                    productos_seleccionados.append((producto_info, cantidad))  # Almacena la info del producto y la cantidad
+                    # Actualiza el carro en la sesión
+                    request.session['productos_seleccionados'] = productos_seleccionados
 
-        
-        request.session['productos_seleccionados'] = productos_seleccionados
-        request.session.modified = True
+        # Redirigir a la vista de carrito con los productos seleccionados
+        return render(request, 'controlinventario/carrito.html', {'productos_seleccionados': productos_seleccionados})
 
-        
-        return redirect('carro')  # Asegúrate que la URL 'carro' esté registrada
-
-    # GET: mostrar formulario de hacer_pedido
-    productos = Producto.objects.all().order_by('nombre')
+    productos = Producto.objects.all()  # Obtener todos los productos
     return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
+
+
+  
 
 # 1) Vista del carro de compras
 @login_required
