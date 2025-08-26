@@ -96,46 +96,50 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    if request.method != 'POST':
-        return redirect('hacer_pedido')
+    # GET: renderiza la página con la lista de productos
+    if request.method == 'GET':
+        productos = Producto.objects.all().only('id', 'nombre', 'descripcion', 'stock')
+        return render(request, 'controlinventario/hacer_pedido.html', {
+            'productos': productos
+        })
 
-    # Cargar carrito desde sesión (o inicializar)
-    carrito = request.session.get('productos_seleccionados', [])
+    # POST: procesa selección y guarda en sesión
+    if request.method == 'POST':
+        carrito = request.session.get('productos_seleccionados', [])
 
-    # Recorrer POST para obtener productos seleccionados
-    for key, value in request.POST.items():
-        if key.startswith('producto_') and value == 'on':
-            prod_id = key.split('_', 1)[1]
+        # Recorremos los campos POST para encontrar productos seleccionados
+        for key, value in request.POST.items():
+            if key.startswith('producto_') and value == 'on':
+                prod_id = key.split('_', 1)[1]
 
-            # Leer cantidad; si no está, usar 1
-            cantidad_str = request.POST.get(f'cantidad_{prod_id}', '1')
-            try:
-                cantidad = int(cantidad_str)
-            except ValueError:
-                cantidad = 1
+                # Leer cantidad; si no está, usar 1
+                cantidad_str = request.POST.get(f'cantidad_{prod_id}', '1')
+                try:
+                    cantidad = int(cantidad_str)
+                except ValueError:
+                    cantidad = 1
 
-            # Cargar el producto desde DB
-            try:
-                producto = Producto.objects.get(id=prod_id)
-            except Producto.DoesNotExist:
-                continue  # si no existe, saltar
+                # Cargar el producto desde DB
+                try:
+                    producto = Producto.objects.get(id=prod_id)
+                except Producto.DoesNotExist:
+                    continue  # si no existe, saltar
 
-            carrito.append({
-                'id': str(prod_id),
-                'nombre': producto.nombre,
-                'descripcion': producto.descripcion,
-                'cantidad': cantidad,
-            })
+                carrito.append({
+                    'id': str(prod_id),
+                    'nombre': producto.nombre,
+                    'descripcion': producto.descripcion,
+                    'cantidad': cantidad,
+                })
 
-    # Guardar de nuevo en sesión
-    request.session['productos_seleccionados'] = carrito
-    request.session.modified = True
+        # Guardar de nuevo en sesión
+        request.session['productos_seleccionados'] = carrito
+        request.session.modified = True
 
-    messages.success(request, 'Productos agregados al carrito.')
-    return redirect('carro')
+        messages.success(request, 'Productos agregados al carrito.')
+        return redirect('carro')
 
-
-# Carrito de compras: mostrar ítems almacenados en sesión
+# Carrito de pedidos
 @login_required
 def carro_view(request):
     productos_seleccionados = request.session.get('productos_seleccionados', [])
