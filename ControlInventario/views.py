@@ -96,34 +96,40 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    if request.method == 'POST':
-        productos_seleccionados = []
+    if request.method != 'POST':
+        productos = Producto.objects.all()
+        return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
 
-        for key in request.POST:
-            if key.startswith('producto_'):  # Detectar productos seleccionados
-                producto_id = key.split('_')[1]
-                cantidad = int(request.POST.get(f'cantidad_{producto_id}', 0))
+    productos_seleccionados = []
 
-                if cantidad > 0:
-                    # Recuperar producto completo
+    for key in request.POST:
+        if key.startswith('producto_'):
+            producto_id = key.split('_')[1]
+            cantidad_str = request.POST.get(f'cantidad_{producto_id}', '0')
+            try:
+                cantidad = int(cantidad_str)
+            except (ValueError, TypeError):
+                cantidad = 0
+
+            if cantidad > 0:
+                try:
                     producto = Producto.objects.get(id=producto_id)
-                    producto_info = {
-                        'id': producto.id,
-                        'nombre': producto.nombre,
-                        'descripcion': producto.descripcion,
-                    }
-                    productos_seleccionados.append((producto_info, cantidad))  # Almacena la info del producto y la cantidad
-                    # Actualiza el carro en la sesión
-                    request.session['productos_seleccionados'] = productos_seleccionados
+                except Producto.DoesNotExist:
+                    continue
 
-        # Redirigir a la vista de carrito con los productos seleccionados
-        return render(request, 'controlinventario/carrito.html', {'productos_seleccionados': productos_seleccionados})
+                productos_seleccionados.append({
+                    'id': producto.id,
+                    'nombre': producto.nombre,
+                    'descripcion': producto.descripcion,
+                    'cantidad': cantidad,
+                })
 
-    productos = Producto.objects.all()  # Obtener todos los productos
-    return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
+    # Guardar en sesión de forma consistente
+    request.session['productos_seleccionados'] = productos_seleccionados
+    request.session.modified = True
 
-
-  
+    # Redirigir al carrito para mostrar los productos
+    return redirect('carro')
 
 # 1) Vista del carro de compras
 @login_required
