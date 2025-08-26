@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from flask import app, render_template
 import pandas as pd
+from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -14,7 +15,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from ControlInventarioColegio import settings
 from .models import Pedido, Producto
-
+from django.views.decorators.http import require_POST
 
 
 # Vista para inicio de sesión
