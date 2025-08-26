@@ -99,7 +99,7 @@ def realizar_pedido(request):
     if request.method == 'POST':
         productos_seleccionados = []
 
-        for key in request.POST:
+        for key, value in request.POST.items():
             if key.startswith('producto_'):
                 producto_id = key.split('_')[1]
                 try:
@@ -124,10 +124,11 @@ def realizar_pedido(request):
                         'cantidad': cantidad
                     })
 
-        # Guardar en sesión
+        
         request.session['productos_seleccionados'] = productos_seleccionados
+        request.session.modified = True
 
-        # Redirigir al carrito para evitar reenvío de formulario
+        
         return redirect('carro')  # Asegúrate que la URL 'carro' esté registrada
 
     # GET: mostrar formulario de hacer_pedido
@@ -137,7 +138,7 @@ def realizar_pedido(request):
 # 1) Vista del carro de compras
 @login_required
 def carro_view(request):
-    # Lee la lista de la sesión (si ya está guardada)
+    
     productos_seleccionados = request.session.get('productos_seleccionados', [])
 
     if request.method == 'POST':
