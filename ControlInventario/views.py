@@ -96,14 +96,19 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    # GET: renderiza la página con la lista de productos
+    # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
-        productos = Producto.objects.all().only('id', 'nombre', 'descripcion', 'stock')
+        # Ordenamos por nombre ascendente
+        productos = Producto.objects.all().order_by('nombre').values(
+            'id', 'nombre', 'descripcion', 'stock'
+        )
+        # Si prefieres obtener objetos para usar en plantillas:
+        # productos = Producto.objects.all().order_by('nombre')
         return render(request, 'controlinventario/hacer_pedido.html', {
             'productos': productos
         })
 
-    # POST: procesa selección y guarda en sesión
+    # POST: procesar selección y guardarlo en la sesión para carro_view
     if request.method == 'POST':
         carrito = request.session.get('productos_seleccionados', [])
 
@@ -137,7 +142,7 @@ def realizar_pedido(request):
         request.session.modified = True
 
         messages.success(request, 'Productos agregados al carrito.')
-        return redirect('carro')
+        return redirect('carro')  # Asegúrate de que la URL con name 'carro' apunta a carro_view
 
 # Carrito de pedidos
 @login_required
