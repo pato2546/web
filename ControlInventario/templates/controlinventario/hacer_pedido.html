@@ -8,9 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hacer Pedido</title>
-  <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- CSS común -->
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 </head>
 <body>
@@ -19,31 +17,17 @@
       <a class="navbar-brand" href="#">
         <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo" class="img-fluid" style="max-height: 50px;">
       </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
-              aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
-          {% if user.is_staff %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a></li>
-          {% endif %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'carro' %}">Carro</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
-        </ul>
-      </div>
+      <!-- ... -->
     </nav>
   </header>
 
   <main class="container mt-3">
     <h1 class="text-center mb-3">Hacer Pedido</h1>
 
-    <!-- Formulario que enviará a la vista realizar_pedido -->
+    <!-- Formulario que envía a la vista realizar_pedido -->
     <form id="hacer-pedido-form" method="POST" action="{% url 'realizar_pedido' %}">
       {% csrf_token %}
 
-      <!-- Botón superior (envía todo) -->
       <div class="d-flex justify-content-end mb-2">
         <button type="submit" class="btn btn-primary">Enviar a Carro</button>
       </div>

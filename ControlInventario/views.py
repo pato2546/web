@@ -96,7 +96,7 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    # GET: mostrar listado de productos para seleccionar
+    # GET: mostrar listado de productos
     if request.method != 'POST':
         productos = Producto.objects.all()
         return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
@@ -145,7 +145,7 @@ def carro_view(request):
         'productos_seleccionados': productos_seleccionados
     })
 
-
+    
 # Vista para crear un nuevo pedido
 @login_required
 def crear_pedido(request):
