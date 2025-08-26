@@ -56,16 +56,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos_seleccionados %}
-                        <tr>
-                            <td>{{ producto.nombre }}</td>
-                            <td>{{ producto.descripcion }}</td>
-                            <td>{{ producto.cantidad }}</td>
-                           
-                        </tr>
+                    {% for item in productos_seleccionados %}
+                        {% if item.nombre and item.descripcion and item.cantidad %}
+                            <tr>
+                                <td>{{ item.nombre }}</td>
+                                <td>{{ item.descripcion }}</td>
+                                <td>{{ item.cantidad }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-danger">Elemento con datos incompletos en el carrito.</td>
+                            </tr>
+                        {% endif %}
                     {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">No hay artículos en el carrito.</td>
+                            <td colspan="3" class="text-center">No hay artículos en el carrito.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
