@@ -16,6 +16,7 @@ from django.utils.html import strip_tags
 from ControlInventarioColegio import settings
 from .models import Pedido, Producto
 from django.views.decorators.http import require_POST
+from types import SimpleNamespace
 
 
 # Vista para inicio de sesión
@@ -148,10 +149,29 @@ def realizar_pedido(request):
 # Carrito de pedidos
 @login_required
 def carro_view(request):
+    # Suponiendo que ya obtienes productos_seleccionados desde la sesión u otra fuente
     productos_seleccionados = request.session.get('productos_seleccionados', [])
+
+    # Convertir cada dict a un objeto ligero con atributos
+    items_obj = []
+    for item in productos_seleccionados:
+        stock = item.get('stock', 0)
+        # Si ya tienes stock_actual distinto de stock, ajusta aquí
+        stock_actual = item.get('stock_actual', stock)
+
+        items_obj.append(SimpleNamespace(
+            id=item.get('id'),
+            nombre=item.get('nombre'),
+            descripcion=item.get('descripcion'),
+            cantidad=item.get('cantidad', 1),
+            stock=stock,
+            stock_actual=stock_actual
+        ))
+
     return render(request, 'controlinventario/carrito.html', {
-        'productos_seleccionados': productos_seleccionados
+        'productos_seleccionados': items_obj
     })
+
 
 @require_POST
 @login_required
