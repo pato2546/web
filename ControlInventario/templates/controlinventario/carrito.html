@@ -56,11 +56,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in productos_seleccionados %}
+                    {% for producto in productos_seleccionados %}
                         <tr>
-                            <td>{{ p.nombre }}</td>
-                            <td>{{ p.descripcion }}</td>
-                            <td>{{ p.cantidad }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.descripcion }}</td>
+                            <td>{{ producto.cantidad }}</td>
                            
                         </tr>
                     {% empty %}
