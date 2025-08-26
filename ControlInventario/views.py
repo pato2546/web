@@ -141,22 +141,10 @@ def carro_view(request):
     productos_seleccionados = request.session.get('productos_seleccionados', [])
 
     if request.method == 'POST':
-        action = request.POST.get('action')
-        remove_id = request.POST.get('remove_id')
-
-        # Eliminación: solo actualiza la sesión
-        if action == 'remove' and remove_id:
-            new_list = [p for p in productos_seleccionados if str(p.get('id')) != str(remove_id)]
-            request.session['productos_seleccionados'] = new_list
-            productos_seleccionados = new_list
-
-            # Feedback opcional al usuario
-            messages.success(request, 'Artículo eliminado del carrito.')
-            # Importante: NO crear pedidos aquí
-        else:
-            # NO procesamos nuevos ítems aquí para evitar crear pedidos accidentalmente
-            # Si necesitas sincronizar desde otra vista, hazlo allí (ruta separada)
-            pass
+    
+        messages.info(request, 'La eliminación de artículos no está disponible en este carrito.')
+       
+        pass
 
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
