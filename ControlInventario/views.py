@@ -96,20 +96,22 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
+    # GET: mostrar listado de productos para seleccionar
     if request.method != 'POST':
         productos = Producto.objects.all()
         return render(request, 'controlinventario/hacer_pedido.html', {'productos': productos})
 
+    # POST: procesar selección y guardar en sesión
     productos_seleccionados = []
 
     for key in request.POST:
         if key.startswith('producto_'):
-            producto_id = key.split('_')[1]
-            cantidad_str = request.POST.get(f'cantidad_{producto_id}', '0')
+            producto_id = key.split('_', 1)[1]
+            cantidad_str = request.POST.get(f'cantidad_{producto_id}', '1')
             try:
                 cantidad = int(cantidad_str)
             except (ValueError, TypeError):
-                cantidad = 0
+                cantidad = 1
 
             if cantidad > 0:
                 try:
@@ -124,15 +126,17 @@ def realizar_pedido(request):
                     'cantidad': cantidad,
                 })
 
-    # Guardar en sesión de forma consistente
-    print("POST keys:", list(request.POST.keys()))
+    # Guardar en sesión
     request.session['productos_seleccionados'] = productos_seleccionados
     request.session.modified = True
 
-    # Redirigir al carrito para mostrar los productos
+    # Depuración opcional
+    print("POST keys:", list(request.POST.keys()))
+    print("Seleccionados guardados en sesión:", productos_seleccionados)
+
     return redirect('carro')
 
-# 1) Vista del carro de compras
+
 @login_required
 def carro_view(request):
     productos_seleccionados = request.session.get('productos_seleccionados', [])
@@ -140,6 +144,7 @@ def carro_view(request):
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
     })
+
 
 # Vista para crear un nuevo pedido
 @login_required

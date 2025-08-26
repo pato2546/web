@@ -39,8 +39,8 @@
   <main class="container mt-3">
     <h1 class="text-center mb-3">Hacer Pedido</h1>
 
-    <!-- Formulario único que envía al carro (POST a 'carro') -->
-    <form id="hacer-pedido-form" method="POST" action="{% url 'carro' %}">
+    <!-- Formulario que enviará a la vista realizar_pedido -->
+    <form id="hacer-pedido-form" method="POST" action="{% url 'realizar_pedido' %}">
       {% csrf_token %}
 
       <!-- Botón superior (envía todo) -->
@@ -60,14 +60,14 @@
             </tr>
           </thead>
           <tbody>
-            {% for productos_view in productos %}
+            {% for p in productos %}
               <tr>
-                <td><input type="checkbox" name="producto_{{ productos_view.id }}" value="{{ productos_view.id }}"></td>
-                <td>{{ productos_view.nombre }}</td>
-                <td>{{ productos_view.descripcion }}</td>
-                <td>{{ productos_view.stock }}</td>
+                <td><input type="checkbox" name="producto_{{ p.id }}" value="{{ p.id }}"></td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.descripcion }}</td>
+                <td>{{ p.stock }}</td>
                 <td>
-                  <input type="number" class="form-control" name="cantidad_{{ productos_view.id }}" min="1" max="{{ productos_view.stock }}" value="1" required>
+                  <input type="number" class="form-control" name="cantidad_{{ p.id }}" min="1" max="{{ p.stock }}" value="1" required>
                 </td>
               </tr>
             {% empty %}
