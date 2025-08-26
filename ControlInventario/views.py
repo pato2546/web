@@ -128,15 +128,7 @@ def realizar_pedido(request):
 # 1) Vista del carro de compras
 @login_required
 def carro_view(request):
-    
     productos_seleccionados = request.session.get('productos_seleccionados', [])
-
-    if request.method == 'POST':
-    
-        messages.info(request, 'La eliminación de artículos no está disponible en este carrito.')
-       
-        pass
-
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
     })
