@@ -39,6 +39,8 @@
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Cantidad</th>
+          <th>Stock DB</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -47,21 +49,51 @@
             <tr>
               <td>{{ item.nombre }}</td>
               <td>{{ item.descripcion }}</td>
-              <td>{{ item.cantidad }}</td>
+
+              <!-- Cantidad en carro con formulario de actualización -->
+              <td>
+                <form method="POST" action="{% url 'actualizar_cantidad_carro' %}" class="form-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" class="form-control form-control-sm" style="width: 90px;">
+                  <button type="submit" class="btn btn-sm btn-primary ml-2">Actualizar</button>
+                </form>
+              </td>
+
+              <!-- Stock actual en DB (lectura) -->
+              <td>
+                Actual: {{ item.stock_actual|default:item.stock }}
+              </td>
+
+              <!-- Acciones: Eliminar -->
+              <td class="d-flex">
+                <form method="POST" action="{% url 'eliminar_item_carro' %}" class="mr-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                </form>
+
+                <!-- Opción opcional: actualizar stock DB para este ítem (si aplica) -->
+                <form method="POST" action="{% url 'stock_db_actualizar' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" value="{{ item.id }}">
+                  <input type="hidden" name="stock" value="{{ item.stock_actual|default:item.stock|default:0 }}">
+                  <button type="submit" class="btn btn-sm btn-warning">Set Stock</button>
+                </form>
+              </td>
             </tr>
           {% else %}
             <tr>
-              <td colspan="3" class="text-danger">Elemento con datos incompletos en el carrito.</td>
+              <td colspan="5" class="text-danger">Elemento con datos incompletos en el carrito.</td>
             </tr>
           {% endif %}
         {% empty %}
-          <tr><td colspan="3" class="text-center">El carrito está vacío.</td></tr>
+          <tr><td colspan="5" class="text-center">El carrito está vacío.</td></tr>
         {% endfor %}
       </tbody>
     </table>
 
-    <a href="{% url 'hacer_pedido' %}" class="btn btn-secondary">Volver a Seleccionar</a>
-    <form method="POST" action="{% url 'confirmar_pedido' %}" style="display:inline;">
+    <form method="POST" action="{% url 'confirmar_pedido' %}">
       {% csrf_token %}
       <button type="submit" class="btn btn-success">Confirmar Pedido</button>
     </form>
