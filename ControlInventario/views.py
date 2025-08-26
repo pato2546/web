@@ -125,6 +125,7 @@ def realizar_pedido(request):
                 })
 
     # Guardar en sesión de forma consistente
+    print("POST keys:", list(request.POST.keys()))
     request.session['productos_seleccionados'] = productos_seleccionados
     request.session.modified = True
 
@@ -135,6 +136,7 @@ def realizar_pedido(request):
 @login_required
 def carro_view(request):
     productos_seleccionados = request.session.get('productos_seleccionados', [])
+    print("sesión productos_seleccionados:", productos_seleccionados)
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': productos_seleccionados
     })
