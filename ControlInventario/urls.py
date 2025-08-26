@@ -13,7 +13,7 @@ urlpatterns = [
     # Crear y manejar pedidos
     path('crear/', views.crear_pedido, name='crear_pedido'),  # Esta línea debe mantenerse si aún se necesita
     path('pedidos/', views.pedidos_view, name='pedidos'),  # Vista de todos los pedidos
-    path('hacer_pedido/', views.realizar_pedido, name='realizar_pedido'),  # Realizar un pedido
+    path('hacer_pedido/', views.realizar_pedido, name='hacer_pedido'),  # Realizar un pedido
     path('carro/', views.carro_view, name='carro'),  # Carro de compras
     path('productos/', views.productos_view, name='productos_view'),  # Vista de productos
     path('home/', views.home_view, name='home'),  # Página principal
