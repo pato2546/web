@@ -101,7 +101,7 @@ def realizar_pedido(request):
     # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
         # Ordenamos por nombre ascendente
-        productos = Producto.objects.all().order_by('nombre').values(
+        productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
             'id', 'nombre', 'descripcion', 'stock'
         )
         # Si prefieres obtener objetos para usar en plantillas:
