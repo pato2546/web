@@ -50,20 +50,7 @@
               <td>{{ item.nombre }}</td>
               <td>{{ item.descripcion }}</td>
 
-              <!-- Cantidad en carro con formulario de actualización 
-              <td>
-                <form method="POST" action="{% url 'actualizar_cantidad_carro' %}" class="form-inline">
-                  {% csrf_token %}
-                  <input type="hidden" name="id" value="{{ item.id }}">
-                  <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" class="form-control form-control-sm" style="width: 90px;">
-                  <button type="submit" class="btn btn-sm btn-primary ml-2">Actualizar</button>
-                </form>
-              </td>-->
-
-              <!-- Stock actual en DB (lectura) -->
-              <td>
-                Actual: {{ item.stock_actual|default:item.stock }}
-              </td>
+              <!-- Aquí ya no hay formulario para actualizar cantidad -->
 
               <!-- Acciones: Eliminar -->
               <td class="d-flex">
@@ -73,13 +60,6 @@
                   <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                 </form>
 
-                <!-- Opción opcional: actualizar stock DB para este ítem (si aplica)
-                <form method="POST" action="{% url 'stock_db_actualizar' %}">
-                  {% csrf_token %}
-                  <input type="hidden" name="id" value="{{ item.id }}">
-                  <input type="hidden" name="stock" value="{{ item.stock_actual|default:item.stock|default:0 }}">
-                  <button type="submit" class="btn btn-sm btn-warning">Set Stock</button>
-                </form> -->
               </td>
             </tr>
           {% else %}
