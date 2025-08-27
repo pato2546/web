@@ -52,11 +52,7 @@
               <!-- Cantidad: mostrado tal como la solicitó -->
               <td>{{ item.cantidad }}</td>
 
-              <!-- Stock actual (lectura) -->
-              <td>
-                Actual: {{ item.stock_actual|default:item.stock }}
-              </td>
-
+             
               <!-- Acciones: Eliminar -->
               <td class="d-flex">
                 <form method="POST" action="{% url 'eliminar_item_carro' %}" class="mr-2">
