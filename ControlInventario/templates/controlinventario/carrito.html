@@ -39,7 +39,7 @@
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Cantidad</th>
-          <th>Stock DB</th>
+          <!--<th>Stock DB</th>-->
           <th>Acciones</th>
         </tr>
       </thead>
@@ -73,13 +73,13 @@
                   <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                 </form>
 
-                <!-- Opción opcional: actualizar stock DB para este ítem (si aplica) -->
+                <!-- Opción opcional: actualizar stock DB para este ítem (si aplica)
                 <form method="POST" action="{% url 'stock_db_actualizar' %}">
                   {% csrf_token %}
                   <input type="hidden" name="id" value="{{ item.id }}">
                   <input type="hidden" name="stock" value="{{ item.stock_actual|default:item.stock|default:0 }}">
                   <button type="submit" class="btn btn-sm btn-warning">Set Stock</button>
-                </form>
+                </form> -->
               </td>
             </tr>
           {% else %}
