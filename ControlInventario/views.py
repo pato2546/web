@@ -174,39 +174,6 @@ def carro_view(request):
     })
 
 
-@require_POST
-@login_required
-def stock_db_actualizar(request):
-    item_id = request.POST.get('id')
-    stock_nuevo = request.POST.get('stock', '0')
-    try:
-        stock_nuevo = int(stock_nuevo)
-    except (TypeError, ValueError):
-        stock_nuevo = 0
-    stock_nuevo = max(0, stock_nuevo)
-
-    try:
-        with transaction.atomic():
-            producto = Producto.objects.select_for_update().get(id=item_id)
-            producto.stock = stock_nuevo
-            producto.save()
-
-        messages.success(request, f'Stock de "{producto.nombre}" actualizado a {stock_nuevo} en DB.')
-
-        # Sincroniza stock en sesión si el item está cargado
-        items = request.session.get('productos_seleccionados', [])
-        for p in items:
-            if str(p.get('id')) == str(item_id):
-                p['stock_actual'] = stock_nuevo
-        request.session['productos_seleccionados'] = items
-
-    except Producto.DoesNotExist:
-        messages.error(request, 'Producto no encontrado.')
-    except Exception as e:
-        messages.error(request, f'Error al actualizar stock: {e}')
-
-    return redirect('carro')
-
 
 @require_POST
 @login_required
@@ -228,26 +195,6 @@ def eliminar_item_carro(request):
     messages.success(request, 'Producto eliminado del carro.')
     return redirect('carro')
 
-
-@require_POST
-@login_required
-def actualizar_cantidad_carro(request):
-    item_id = request.POST.get('id')
-    try:
-        nueva_cantidad = int(request.POST.get('cantidad', 1))
-    except (TypeError, ValueError):
-        nueva_cantidad = 1
-    nueva_cantidad = max(1, nueva_cantidad)
-
-    items = request.session.get('productos_seleccionados', [])
-    for p in items:
-        if str(p.get('id')) == str(item_id):
-            p['cantidad'] = nueva_cantidad
-            break
-    request.session['productos_seleccionados'] = items
-    request.session.modified = True
-    messages.success(request, 'Cantidad actualizada en el carro.')
-    return redirect('carro')
 
 
 # Vista para crear un nuevo pedido
