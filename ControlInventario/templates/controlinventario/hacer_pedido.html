@@ -8,6 +8,31 @@
   <title>Hacer Pedido</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <style>
+    /* Barra sticky debajo del header para el botón Enviar a Carro */
+    .pedido-toolbar {
+      position: sticky;
+      top: 56px; /* altura del header fixed-top; ajusta si cambia */
+      z-index: 10;
+      background: #fff;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    /* Opcional: estilo suave para la tabla y el contenedor */
+    .tabla-scroll {
+      max-height: 60vh;
+      overflow: auto;
+    }
+
+    /* Encabezados fijos de la tabla (thead) al hacer scroll dentro de la tabla */
+    table thead th {
+      position: sticky;
+      top: 0;
+      background: #343a40; /* color dark de bootstrap */
+      color: #fff;
+      z-index: 5;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -19,7 +44,6 @@
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
@@ -34,21 +58,16 @@
     </nav>
   </header>
 
-  <!-- Nueva barra de encabezado con título + botón -->
-  <div class="container-fluid bg-white border-bottom" id="header-pedido" style="position: sticky; top: 56px; z-index: 25;">
-    <div class="container d-flex justify-content-between align-items-center" style="height: 64px;">
-      <h1 class="h4 mb-0 text-dark" style="flex: 1;">Hacer Pedido</h1>
-      <!-- Botón de enviar al carrito: optimizamos para que sea claro y visible -->
-      <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}" class="d-inline-block mb-0">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary btn-lg" aria-label="Enviar a Carro">Enviar a Carro</button>
-      </form>
+  <!-- Barra sticky con el botón "Enviar a Carro" -->
+  <div class="pedido-toolbar sticky-top bg-white pt-2 pb-2 border-bottom">
+    <div class="container d-flex justify-content-end">
+      <button type="submit" form="hacer-pedido-form" class="btn btn-primary">Enviar a Carro</button>
     </div>
   </div>
 
-  <main class="container mt-4" style="padding-top: 16px;">
-    <!-- Ya no necesitas el título aquí si lo moviste a la barra superior -->
-    <!-- Resto del contenido (tabla de productos) -->
+  <main class="container mt-4" style="padding-top: 20px;">
+    <h1 class="text-center mb-3">Hacer Pedido</h1>
+
     <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}">
       {% csrf_token %}
 
