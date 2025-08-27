@@ -8,31 +8,6 @@
   <title>Hacer Pedido</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-  <style>
-    /* Barra sticky debajo del header para el botón Enviar a Carro */
-    .pedido-toolbar {
-      position: sticky;
-      top: 56px; /* altura del header fixed-top; ajusta si cambia */
-      z-index: 10;
-      background: #fff;
-      border-bottom: 1px solid #e5e5e5;
-    }
-
-    /* Opcional: estilo suave para la tabla y el contenedor */
-    .tabla-scroll {
-      max-height: 60vh;
-      overflow: auto;
-    }
-
-    /* Encabezados fijos de la tabla (thead) al hacer scroll dentro de la tabla */
-    table thead th {
-      position: sticky;
-      top: 0;
-      background: #343a40; /* color dark de bootstrap */
-      color: #fff;
-      z-index: 5;
-    }
-  </style>
 </head>
 <body>
   <header>
@@ -58,9 +33,10 @@
     </nav>
   </header>
 
-  <!-- Barra sticky con el botón "Enviar a Carro" -->
-  <div class="pedido-toolbar sticky-top bg-white pt-2 pb-2 border-bottom">
-    <div class="container d-flex justify-content-end">
+  <!-- Barra sticky al lado derecho dentro del header -->
+  <div class="pedido-toolbar-sticky sticky-top bg-white border-bottom">
+    <div class="container pedido-toolbar-inner">
+      <!-- Botón asociado al formulario aunque esté fuera del <form> -->
       <button type="submit" form="hacer-pedido-form" class="btn btn-primary">Enviar a Carro</button>
     </div>
   </div>

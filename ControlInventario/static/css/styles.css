@@ -67,3 +67,40 @@ body {
         font-size: 1.2rem; /* Ajustar aún más el título en dispositivos pequeños */
     }
 }
+/* Barra sticky al lado derecho dentro del header */
+.pedido-toolbar-sticky {
+  position: sticky;
+  top: 56px; /* ajusta si tu header tiene otra altura */
+  z-index: 20;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.pedido-toolbar-inner {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 16px;
+}
+
+/* Opcional: comentario para mejorar lectura en la tabla cuando haga scroll */
+.tabla-scroll {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* Encabezados fijos de la tabla al hacer scroll dentro de la tabla */
+table thead th {
+  position: sticky;
+  top: 0;
+  background: #343a40;
+  color: #fff;
+  z-index: 5;
+}
+
+/* Ajuste responsive (opcional) */
+@media (max-width: 768px) {
+  .pedido-toolbar-sticky { top: 56px; }
+  .pedido-toolbar-inner { height: 52px; padding-right: 12px; }
+}
