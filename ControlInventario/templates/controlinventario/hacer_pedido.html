@@ -29,14 +29,9 @@
           <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
           {% endif %}
           <li class="nav-item"><a class="nav-link" href="{% url 'carro' %}">Ver Carrito</a></li>
-        </ul>
-        <ul class="navbar-nav ml-auto">
-          {% if user.is_authenticated %}
           <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
-          {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
-          {% endif %}
         </ul>
+        
       </div>
     </nav>
   </header>
