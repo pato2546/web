@@ -149,14 +149,15 @@ def realizar_pedido(request):
 # Carrito de pedidos
 @login_required
 def carro_view(request):
-    # Suponiendo que ya obtienes productos_seleccionados desde la sesión u otra fuente
+    """
+    Muestra el carrito almacenado en sesión.
+    Evita tocar la BD al eliminar/actualizar cantidades.
+    """
     productos_seleccionados = request.session.get('productos_seleccionados', [])
 
-    # Convertir cada dict a un objeto ligero con atributos
     items_obj = []
     for item in productos_seleccionados:
         stock = item.get('stock', 0)
-        # Si ya tienes stock_actual distinto de stock, ajusta aquí
         stock_actual = item.get('stock_actual', stock)
 
         items_obj.append(SimpleNamespace(
@@ -204,17 +205,29 @@ def stock_db_actualizar(request):
     except Exception as e:
         messages.error(request, f'Error al actualizar stock: {e}')
 
-    return redirect('carro')  # Asegúrate de que este nombre de ruta exista
+    return redirect('carro')
+
 
 @require_POST
 @login_required
 def eliminar_item_carro(request):
+    """
+    Elimina un ítem del carrito sin tocar la BD.
+    Solo remueve el item de la lista en sesión 'productos_seleccionados'.
+    """
     item_id = request.POST.get('id')
+    if item_id is None:
+        messages.error(request, 'ID de producto no proporcionado.')
+        return redirect('carro')
+
     items = request.session.get('productos_seleccionados', [])
     nueva_lista = [it for it in items if str(it.get('id')) != str(item_id)]
     request.session['productos_seleccionados'] = nueva_lista
+    request.session.modified = True
+
     messages.success(request, 'Producto eliminado del carro.')
     return redirect('carro')
+
 
 @require_POST
 @login_required
@@ -232,9 +245,9 @@ def actualizar_cantidad_carro(request):
             p['cantidad'] = nueva_cantidad
             break
     request.session['productos_seleccionados'] = items
+    request.session.modified = True
     messages.success(request, 'Cantidad actualizada en el carro.')
     return redirect('carro')
-
 
 
 # Vista para crear un nuevo pedido
