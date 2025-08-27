@@ -104,3 +104,30 @@ table thead th {
   .pedido-toolbar-sticky { top: 56px; }
   .pedido-toolbar-inner { height: 52px; padding-right: 12px; }
 }
+
+/* Base (mobile-first) */
+:root {
+  --bg: #fff;
+  --text: #333;
+  --primary: #0d6efd;
+  --muted: #6c757d;
+}
+
+body { font-family: system-ui, -apple-system, "Segoe UI", Roboto; color: var(--text); }
+
+/* Small devices (phones, 576px and up) */
+@media (min-width: 576px) {
+  :root { --container: 540px; }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .container { padding-left: 20px; padding-right: 20px; }
+  .btn { padding: .5rem .75rem; font-size: 0.95rem; }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+  .btn { font-size: 1rem; }
+}
