@@ -343,7 +343,7 @@ def logout_view(request):
 @login_required
 def autorizar_pedido(request):
     # Filtramos los pedidos que no han sido aprobados ni rechazados
-    pedidos = Pedido.objects.filter(autorizado=False)  # Asegúrate que ‘autorizado’ esté como None para los pendientes
+    pedidos = Pedido.objects.filter(autorizado__isnull=True)  # Asegúrate que ‘autorizado’ esté como None para los pendientes
 
     return render(request, 'controlinventario/autorizar_pedido.html', {'pedidos': pedidos})
 
