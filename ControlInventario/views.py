@@ -290,7 +290,7 @@ def confirmar_pedido(request):
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
     # Limpiar el carrito tras confirmar
     request.session['productos_seleccionados'] = []
-    return redirect('pedidos')
+    return redirect('/') # o redirige al path de tu home
 
 # Vista para exportar pedidos a Excel
 @login_required
