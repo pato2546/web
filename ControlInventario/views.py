@@ -282,7 +282,7 @@ def confirmar_pedido(request):
             )
         except Exception as e:
             messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
-            return redirect('home')
+            return redirect('hacer_pedido')
         
     # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
@@ -291,7 +291,7 @@ def confirmar_pedido(request):
     request.session['productos_seleccionados'] = []
     request.session.modified = True
 
-    return redirect('home') 
+    return redirect('hacer_pedido') 
 
 
 
