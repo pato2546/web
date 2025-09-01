@@ -60,6 +60,8 @@
                         <th>Seleccionar</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +72,8 @@
                             </td>
                             <td><label for="pedido_{{ pedido.id }}">{{ pedido.producto.nombre }}</label></td>
                             <td>{{ pedido.cantidad }}</td>
+                            <td>{{ pedido.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ pedido.fecha|date:"H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
