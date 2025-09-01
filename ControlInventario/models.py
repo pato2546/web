@@ -26,7 +26,7 @@ class Pedido(models.Model):
     cargo = models.CharField(max_length=20, choices=CARGOS_OPCIONES, default='otro')
     cantidad = models.PositiveIntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
-    autorizado = models.BooleanField(default=False)  # Campo agregado para autorización
+    autorizado = models.BooleanField(null=True, default=None)  # Campo agregado para autorización
     motivo_rechazo = models.TextField(null=True, blank=True)  # Campo para almacenar el motivo de rechazo
     
     

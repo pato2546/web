@@ -258,19 +258,12 @@ def confirmar_pedido(request):
             usuario=request.user,
             producto=producto,
             cantidad=producto_info['cantidad'],
-            autorizado=False
+            autorizado=None
         )
         pedido.save()
         lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
 
-    # Opción B (si tu modelo es Pedido con items)
-    # from .models import Pedido, PedidoItem
-    # pedido = Pedido.objects.create(usuario=request.user, motivo=motivo, autorizado=False)
-    # for producto_info in productos_seleccionados:
-    #     producto = Producto.objects.get(id=producto_info['id'])
-    #     PedidoItem.objects.create(pedido=pedido, producto=producto, cantidad=producto_info['cantidad'])
-    # lista_pedidos = [f'{p["nombre"]} (Cantidad: {p["cantidad"]})' for p in productos_seleccionados]
-
+   
     subject = 'Solicitud de Autorización de Pedido'
     message_admin = (
         f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
@@ -291,6 +284,8 @@ def confirmar_pedido(request):
     # Limpiar el carrito tras confirmar
     request.session['productos_seleccionados'] = []
     return redirect('home') # o redirige al path de tu productos
+
+
 
 # Vista para exportar pedidos a Excel
 @login_required
@@ -363,10 +358,15 @@ def procesar_aprobacion(request):
                 producto = pedido.producto
 
                 if producto.stock >= pedido.cantidad:
-                    producto.stock -= pedido.cantidad
-                    producto.save()
+
+                     # Aprobar
                     pedido.autorizado = True
                     pedido.save()
+
+                    # Actualizar stock (si aplica)
+                    producto.stock -= pedido.cantidad
+                    producto.save()
+
                     messages.success(request, f"Pedido de {pedido.usuario.username} para {pedido.producto.nombre} autorizado.")
 
                     # Enviar correo al usuario
@@ -406,6 +406,7 @@ def procesar_rechazo(request):
             html_message = render_to_string('controlinventario/rechazar_pedido.html', {'pedido': pedido, 'motivo': motivo_rechazo})
             plain_message = strip_tags(html_message)  # Alternativa de texto plano para el correo
             send_mail(subject, plain_message, 'tu_email@gmail.com', [pedido.usuario.email], html_message=html_message)
+        
         except Pedido.DoesNotExist:
             messages.error(request, f"El pedido con ID {pedido_id} no existe.")
         
