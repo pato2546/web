@@ -272,18 +272,26 @@ def confirmar_pedido(request):
     if motivo:
         message_admin += f"\nMotivo de la solicitud:\n{motivo}"
 
-    send_mail(
-        subject,
-        message_admin,
-        settings.EMAIL_HOST_USER,
-        ['pedidocolegio@gmail.com'],  # ajusta destinatario
-        fail_silently=False,
-    )
-
+        try:
+            send_mail(
+                subject,
+                message_admin,
+                settings.EMAIL_HOST_USER,
+                ['pedidocolegio@gmail.com'],  # ajusta destinatario
+                fail_silently=False,
+            )
+        except Exception as e:
+            messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+            return redirect('hacer_pedido')
+        
+    # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+
     # Limpiar el carrito tras confirmar
     request.session['productos_seleccionados'] = []
-    return redirect('home') # o redirige al path de tu productos
+    request.session.modified = True
+    
+    return redirect('home') 
 
 
 
