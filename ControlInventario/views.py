@@ -269,6 +269,7 @@ def confirmar_pedido(request):
         f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
         f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
     )
+
     if motivo:
         message_admin += f"\nMotivo de la solicitud:\n{motivo}"
 
@@ -280,10 +281,15 @@ def confirmar_pedido(request):
                 ['pedidocolegio@gmail.com'],  # ajusta destinatario
                 fail_silently=False,
             )
+
         except Exception as e:
-            messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+            messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
             return redirect('hacer_pedido')
+    else:
+        messages.info(request, 'No se proporcionó un motivo. No se envía solicitud de autorización por correo.')
         
+        pass
+    
     # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
 
