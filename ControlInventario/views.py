@@ -1,10 +1,10 @@
+import logging
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from flask import app, render_template
 import pandas as pd
 from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
@@ -234,61 +234,62 @@ def crear_pedido(request):
     return render(request, 'controlinventario/crear_pedido.html', {'productos': productos})
 
 # 2) Vista para confirmar el pedido
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def confirmar_pedido(request):
     if request.method != 'POST':
         return redirect('hacer_pedido')  # o la ruta que uses para hacer_pedido
 
     productos_seleccionados = request.session.get('productos_seleccionados', [])
-    motivo = request.POST.get('motivo_pedido', '').strip()
 
     if not productos_seleccionados:
         messages.error(request, 'No se han seleccionado productos.')
         return redirect('hacer_pedido')
 
-    # Opción A: Crear un Pedido por ítem
+    # Construir y guardar pedidos en una transacción atómica
     lista_pedidos = []
-    for producto_info in productos_seleccionados:
-        try:
-            producto = Producto.objects.get(id=producto_info['id'])
-        except Producto.DoesNotExist:
-            continue
+    try:
+        with transaction.atomic():
+            for producto_info in productos_seleccionados:
+                try:
+                    producto = Producto.objects.get(id=producto_info['id'])
+                except Producto.DoesNotExist:
+                    continue
 
-        pedido = Pedido(
-            usuario=request.user,
-            producto=producto,
-            cantidad=producto_info['cantidad'],
-            autorizado=None
-        )
-        pedido.save()
-        lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
+                pedido = Pedido(
+                    usuario=request.user,
+                    producto=producto,
+                    cantidad=producto_info['cantidad'],
+                    autorizado=None
+                )
+                pedido.save()
+                lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
+    except Exception as e:
+        logger.exception("Error al crear pedidos en confirmar_pedido")
+        messages.error(request, 'Error al procesar el pedido. Por favor, intenta nuevamente.')
+        return redirect('carro')
 
-   
     subject = 'Solicitud de Autorización de Pedido'
     message_admin = (
         f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
         f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
     )
 
-    if motivo:
-        message_admin += f"\nMotivo de la solicitud:\n{motivo}"
-
-        try:
-            send_mail(
-                subject,
-                message_admin,
-                settings.EMAIL_HOST_USER,
-                ['pedidocolegio@gmail.com'],  # ajusta destinatario
-                fail_silently=False,
-            )
-
-        except Exception as e:
-            messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
-            return redirect('carro')
-    else:
-        messages.info(request, 'No se proporcionó un motivo. No se envía solicitud de autorización por correo.')
-        
-        pass
+    # Enviar correo de autorización siempre (ya no depende de motivo)
+    try:
+        send_mail(
+            subject,
+            message_admin,
+            settings.EMAIL_HOST_USER,
+            ['pedidocolegio@gmail.com'],  # ajusta destinatario
+            fail_silently=False,
+        )
+    except Exception as e:
+        logger.exception("Error al enviar correo de autorización")
+        messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
+        return redirect('carro')
 
     # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
@@ -297,8 +298,7 @@ def confirmar_pedido(request):
     request.session['productos_seleccionados'] = []
     request.session.modified = True
 
-    return redirect('carro') 
-
+    return redirect('carro')
 
 
 # Vista para exportar pedidos a Excel
