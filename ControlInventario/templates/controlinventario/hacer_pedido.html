@@ -73,6 +73,15 @@
     <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}">
       {% csrf_token %}
 
+      <form method="GET" action="{% url 'realizar_pedido' %}" class="form-inline mb-3">
+        <div class="input-group w-100">
+          <input type="text" name="q" value="{{ query|default_if_none:'' }}" class="form-control" placeholder="Buscar productos...">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+          </div>
+        </div>
+      </form>
+      
       <div class="tabla-scroll border rounded p-2">
         <table class="table table-striped table-bordered">
           <thead class="thead-dark">

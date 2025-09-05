@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.db.models import Q
 import pandas as pd
 from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
@@ -100,16 +101,27 @@ def pedidos_view(request):
 def realizar_pedido(request):
     # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
-        # Ordenamos por nombre ascendente
-        productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
-            'id', 'nombre', 'descripcion', 'stock'
-        )
-        # Si prefieres obtener objetos para usar en plantillas:
-        # productos = Producto.objects.all().order_by('nombre')
-        return render(request, 'controlinventario/hacer_pedido.html', {
-            'productos': productos
-        })
+        query = request.GET.get('q', '').strip()
 
+        if query:
+        # Ordenamos por nombre ascendente
+             productos = Producto.objects.filter(
+                stock__gt=0
+            ).filter(
+                Q(nombre__icontains=query) | Q(descripcion__icontains=query)
+            ).order_by('nombre').values('id', 'nombre', 'descripcion', 'stock')
+        else:
+            productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
+                'id', 'nombre', 'descripcion', 'stock'
+            )
+
+        # Si prefieres obtener objetos para usar en plantillas:
+       
+        return render(request, 'controlinventario/hacer_pedido.html', {
+            'productos': productos,
+            'query': query,  # para conservar el valor en la barra de búsqueda
+        })
+    
     # POST: procesar selección y guardarlo en la sesión para carro_view
     if request.method == 'POST':
         carrito = request.session.get('productos_seleccionados', [])
