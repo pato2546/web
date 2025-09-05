@@ -101,27 +101,16 @@ def pedidos_view(request):
 def realizar_pedido(request):
     # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
-        query = request.GET.get('q', '').strip()
-
-        if query:
         # Ordenamos por nombre ascendente
-             productos = Producto.objects.filter(
-                stock__gt=0
-            ).filter(
-                Q(nombre__icontains=query) | Q(descripcion__icontains=query)
-            ).order_by('nombre').values('id', 'nombre', 'descripcion', 'stock')
-        else:
-            productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
-                'id', 'nombre', 'descripcion', 'stock'
-            )
-
+        productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
+            'id', 'nombre', 'descripcion', 'stock'
+        )
         # Si prefieres obtener objetos para usar en plantillas:
-       
+        # productos = Producto.objects.all().order_by('nombre')
         return render(request, 'controlinventario/hacer_pedido.html', {
-            'productos': productos,
-            'query': query,  # para conservar el valor en la barra de búsqueda
+            'productos': productos
         })
-    
+
     # POST: procesar selección y guardarlo en la sesión para carro_view
     if request.method == 'POST':
         carrito = request.session.get('productos_seleccionados', [])
