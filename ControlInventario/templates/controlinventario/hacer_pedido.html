@@ -8,22 +8,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hacer Pedido</title>
+  <!-- Bootstrap 4 -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
   <style>
+    /* Barra sticky debajo del header para el botón Enviar a Carro */
     .pedido-toolbar {
       position: sticky;
       top: 56px;
       z-index: 10;
       background: #fff;
       border-bottom: 1px solid #e5e5e5;
+      padding: 8px 0;
     }
 
+    /* Contenedor de la tabla con scroll suave */
     .tabla-scroll {
-      max-height: 60vh;
+      max-height: 62vh;
       overflow: auto;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+      background: #fff;
     }
 
+    /* Encabezados fijos de la tabla (thead) al hacer scroll dentro de la tabla */
     table thead th {
       position: sticky;
       top: 0;
@@ -31,13 +39,30 @@
       color: #fff;
       z-index: 5;
     }
+
+    /* Espaciado cómodo en filas para pantallas pequeñas */
+    tbody td {
+      vertical-align: middle;
+    }
+
+    /* Mejora visual en inputs de cantidad */
+    .cantidad-input {
+      width: 90px;
+    }
+
+    /* Responsividad adicional */
+    @media (max-width: 768px) {
+      .pedido-toolbar { top: 56px; }
+      table thead th, table tbody td { font-size: 14px; padding: 8px; }
+      .cantidad-input { width: 70px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <a class="navbar-brand" href="#">
-        <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo" class="img-fluid" style="max-height: 50px;">
+        <img src="{% static 'imagenes/colegioConstitucion.png' %}" alt="Logo" class="img-fluid" style="max-height: 40px;">
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,48 +82,55 @@
     </nav>
   </header>
 
-  <div class="pedido-toolbar sticky-top bg-white pt-2 pb-2 border-bottom">
+  <!-- Barra sticky con el botón "Enviar a Carro" -->
+  <div class="pedido-toolbar sticky-top bg-white border-bottom">
     <div class="container d-flex justify-content-end">
-      <button type="submit" form="hacer-pedido-form" class="btn btn-primary">Enviar a Carro</button>
+      <button type="submit" form="hacer-pedido-form" class="btn btn-primary btn-lg" style="min-width:180px;">
+        Enviar a Carro
+      </button>
     </div>
   </div>
 
-  <main class="container mt-4" style="padding-top: 20px;">
-    <h1 class="text-center mb-3">Hacer Pedido</h1>
+  <main class="container mt-4" style="padding-top: 18px;">
+    <h1 class="text-center mb-3 display-4">Hacer Pedido</h1>
 
     <!-- Formulario de búsqueda (GET) -->
     <form method="GET" class="mb-3" id="buscador-form" action="{% url 'hacer_pedido' %}">
-      <div class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query|default:'' }}">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+      <div class="form-row align-items-center">
+        <div class="col-12 col-md-8 mb-2 mb-md-0">
+          <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query|default:'' }}">
+        </div>
+        <div class="col-12 col-md-4">
+          <button class="btn btn-outline-secondary w-100" type="submit">Buscar</button>
         </div>
       </div>
     </form>
 
+    <!-- Tabla de productos -->
     <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}">
       {% csrf_token %}
-     
-      <div class="tabla-scroll border rounded p-2">
-        <table class="table table-striped table-bordered" id="tabla-productos">
+      <div class="tabla-scroll">
+        <table class="table table-striped table-bordered w-100" id="tabla-productos">
           <thead class="thead-dark">
             <tr>
-              <th>Seleccionar</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Stock Disponible</th>
-              <th>Cantidad</th>
+              <th scope="col" style="min-width: 110px;">Seleccionar</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Descripción</th>
+              <th scope="col" class="text-center" style="min-width: 140px;">Stock Disponible</th>
+              <th scope="col" class="text-center" style="min-width: 120px;">Cantidad</th>
             </tr>
           </thead>
           <tbody>
             {% for p in productos %}
               <tr>
-                <td><input type="checkbox" name="producto_{{ p.id }}" value="on"></td>
+                <td class="text-center" style="white-space: nowrap;">
+                  <input type="checkbox" name="producto_{{ p.id }}" value="on" aria-label="Seleccionar {{ p.nombre }}">
+                </td>
                 <td>{{ p.nombre }}</td>
                 <td>{{ p.descripcion }}</td>
-                <td>{{ p.stock }}</td>
-                <td>
-                  <input type="number" class="form-control" name="cantidad_{{ p.id }}" min="1" max="{{ p.stock }}" value="1" required>
+                <td class="text-center">{{ p.stock }}</td>
+                <td class="text-center">
+                  <input type="number" class="form-control cantidad-input" name="cantidad_{{ p.id }}" min="1" max="{{ p.stock }}" value="1" required>
                 </td>
               </tr>
             {% empty %}
