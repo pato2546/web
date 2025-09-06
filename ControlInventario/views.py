@@ -99,39 +99,36 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
-        # Ordenamos por nombre ascendente
-        productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
-            'id', 'nombre', 'descripcion', 'stock'
-        )
-        # Si prefieres obtener objetos para usar en plantillas:
-        # productos = Producto.objects.all().order_by('nombre')
+        q = request.GET.get('q', '').strip()
+        productos_qs = Producto.objects.filter(stock__gt=0)
+        if q:
+            productos_qs = productos_qs.filter(
+                Q(nombre__icontains=q) | Q(descripcion__icontains=q)
+            )
+        productos = productos_qs.order_by('nombre').values('id', 'nombre', 'descripcion', 'stock')
         return render(request, 'controlinventario/hacer_pedido.html', {
-            'productos': productos
+            'productos': productos,
+            'query': q,
         })
 
-    # POST: procesar selección y guardarlo en la sesión para carro_view
     if request.method == 'POST':
         carrito = request.session.get('productos_seleccionados', [])
 
-        # Recorremos los campos POST para encontrar productos seleccionados
         for key, value in request.POST.items():
             if key.startswith('producto_') and value == 'on':
                 prod_id = key.split('_', 1)[1]
 
-                # Leer cantidad; si no está, usar 1
                 cantidad_str = request.POST.get(f'cantidad_{prod_id}', '1')
                 try:
                     cantidad = int(cantidad_str)
                 except ValueError:
                     cantidad = 1
 
-                # Cargar el producto desde DB
                 try:
                     producto = Producto.objects.get(id=prod_id)
                 except Producto.DoesNotExist:
-                    continue  # si no existe, saltar
+                    continue
 
                 carrito.append({
                     'id': str(prod_id),
@@ -140,13 +137,13 @@ def realizar_pedido(request):
                     'cantidad': cantidad,
                 })
 
-        # Guardar de nuevo en sesión
         request.session['productos_seleccionados'] = carrito
         request.session.modified = True
 
         messages.success(request, 'Productos agregados al carrito.')
-        return redirect('carro')  # Asegúrate de que la URL con name 'carro' apunta a carro_view
-
+        return redirect('carro')
+    
+    
 # Carrito de pedidos
 @login_required
 def carro_view(request):

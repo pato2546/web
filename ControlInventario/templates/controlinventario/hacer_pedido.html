@@ -11,26 +11,23 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link href="{% static 'css/styles.css' %}" rel="stylesheet">
   <style>
-    /* Barra sticky debajo del header para el botón Enviar a Carro */
     .pedido-toolbar {
       position: sticky;
-      top: 56px; /* altura del header fixed-top; ajusta si cambia */
+      top: 56px;
       z-index: 10;
       background: #fff;
       border-bottom: 1px solid #e5e5e5;
     }
 
-    /* Opcional: estilo suave para la tabla y el contenedor */
     .tabla-scroll {
       max-height: 60vh;
       overflow: auto;
     }
 
-    /* Encabezados fijos de la tabla (thead) al hacer scroll dentro de la tabla */
     table thead th {
       position: sticky;
       top: 0;
-      background: #343a40; /* color dark de bootstrap */
+      background: #343a40;
       color: #fff;
       z-index: 5;
     }
@@ -60,7 +57,6 @@
     </nav>
   </header>
 
-  <!-- Barra sticky con el botón "Enviar a Carro" -->
   <div class="pedido-toolbar sticky-top bg-white pt-2 pb-2 border-bottom">
     <div class="container d-flex justify-content-end">
       <button type="submit" form="hacer-pedido-form" class="btn btn-primary">Enviar a Carro</button>
@@ -70,13 +66,21 @@
   <main class="container mt-4" style="padding-top: 20px;">
     <h1 class="text-center mb-3">Hacer Pedido</h1>
 
+    <!-- Formulario de búsqueda (GET) -->
+    <form method="GET" class="mb-3" id="buscador-form" action="{% url 'hacer_pedido' %}">
+      <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Buscar producto..." value="{{ query|default:'' }}">
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="submit">Buscar</button>
+        </div>
+      </div>
+    </form>
+
     <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}">
       {% csrf_token %}
-
      
-
       <div class="tabla-scroll border rounded p-2">
-        <table class="table table-striped table-bordered">
+        <table class="table table-striped table-bordered" id="tabla-productos">
           <thead class="thead-dark">
             <tr>
               <th>Seleccionar</th>
@@ -114,6 +118,7 @@
     {% endif %}
   </main>
 
+  <!-- Scripts -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
