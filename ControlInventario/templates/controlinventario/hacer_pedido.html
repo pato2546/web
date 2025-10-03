@@ -102,6 +102,7 @@
         </div>
         <div class="col-12 col-md-4">
           <button class="btn btn-outline-secondary w-100" type="submit">Buscar</button>
+          <button type="button" id="limpiar-seleccion" class="btn btn-warning mb-3" title="Limpiar selección">Limpiar selección</button>
         </div>
       </div>
     </form>
@@ -154,5 +155,53 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const storageKey = 'pedido_en_progreso';
+  // 1) Cargar y marcar checkboxes guardados
+  const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  saved.forEach(function(id) {
+    const chk = document.querySelector('input[name="producto_' + id + '"]');
+    if (chk) {
+      chk.checked = true;
+    }
+  });
+
+  // 2) Guardar la selección al cambiar checkboxes
+  document.querySelectorAll('input[type="checkbox"][name^="producto_"]').forEach(function(chk) {
+    chk.addEventListener('change', function() {
+      const checkedIds = Array.from(document.querySelectorAll('input[type="checkbox"][name^="producto_"]:checked'))
+        .map(function(el) {
+          return el.name.split('_')[1];
+        });
+      localStorage.setItem(storageKey, JSON.stringify(checkedIds));
+      // También habilitar/deshabilitar cantidad según estado
+      const pid = chk.name.split('_')[1];
+      const qty = document.querySelector('input[name="cantidad_' + pid + '"]');
+      if (qty) qty.disabled = !chk.checked;
+      // Si se desmarca y no hay ninguno seleccionado, quizá quieras limpiar
+      // opcional: si (checkedIds.length === 0) localStorage.removeItem(storageKey);
+    });
+    // Inicialmente deshabilita la cantidad si no está marcado
+    const pid = chk.name.split('_')[1];
+    const qty = document.querySelector('input[name="cantidad_' + pid + '"]');
+    if (qty) qty.disabled = !chk.checked;
+  });
+
+  // 3) Botón Limpiar selección
+  document.getElementById('limpiar-seleccion')?.addEventListener('click', function() {
+    localStorage.removeItem(storageKey);
+    // Desmarcar todos los checks de la tabla
+    document.querySelectorAll('input[type="checkbox"][name^="producto_"]').forEach(function(cb) {
+      cb.checked = false;
+      const pid = cb.name.split('_')[1];
+      const qty = document.querySelector('input[name="cantidad_' + pid + '"]');
+      if (qty) qty.disabled = true;
+    });
+    // Recargar para limpiar cualquier estado de búsqueda
+    location.reload();
+  });
+});
+</script>
 </body>
 </html>
