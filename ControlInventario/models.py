@@ -25,6 +25,7 @@ class Pedido(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cargo = models.CharField(max_length=20, choices=CARGOS_OPCIONES, default='otro')
     cantidad = models.PositiveIntegerField()
+    motivo = models.TextField(blank=True, null=True)  # ← NUEVO CAMPO
     fecha = models.DateTimeField(auto_now_add=True)
     autorizado = models.BooleanField(default=False)  # Campo agregado para autorización
     motivo_rechazo = models.TextField(null=True, blank=True)  # Campo para almacenar el motivo de rechazo

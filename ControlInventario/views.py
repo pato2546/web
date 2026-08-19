@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from flask import app, render_template
 import pandas as pd
 from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
@@ -126,6 +125,8 @@ def realizar_pedido(request):
                 except ValueError:
                     cantidad = 1
 
+                motivo = request.POST.get(f'motivo_{prod_id}', '').strip()
+
                 # Cargar el producto desde DB
                 try:
                     producto = Producto.objects.get(id=prod_id)
@@ -137,6 +138,7 @@ def realizar_pedido(request):
                     'nombre': producto.nombre,
                     'descripcion': producto.descripcion,
                     'cantidad': cantidad,
+                    'motivo': motivo,  # ← NUEVO: guardar motivo en sesión
                 })
 
         # Guardar de nuevo en sesión
@@ -165,6 +167,7 @@ def carro_view(request):
             nombre=item.get('nombre'),
             descripcion=item.get('descripcion'),
             cantidad=item.get('cantidad', 1),
+            motivo=item.get('motivo', ''),  # ← NUEVO
             stock=stock,
             stock_actual=stock_actual
         ))
@@ -258,18 +261,14 @@ def confirmar_pedido(request):
             usuario=request.user,
             producto=producto,
             cantidad=producto_info['cantidad'],
+            motivo=producto_info.get('motivo', ''),  # ← NUEVO: asignar motivo
             autorizado=False
         )
         pedido.save()
         lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
-
-    # Opción B (si tu modelo es Pedido con items)
-    # from .models import Pedido, PedidoItem
-    # pedido = Pedido.objects.create(usuario=request.user, motivo=motivo, autorizado=False)
-    # for producto_info in productos_seleccionados:
-    #     producto = Producto.objects.get(id=producto_info['id'])
-    #     PedidoItem.objects.create(pedido=pedido, producto=producto, cantidad=producto_info['cantidad'])
-    # lista_pedidos = [f'{p["nombre"]} (Cantidad: {p["cantidad"]})' for p in productos_seleccionados]
+        if producto_info.get('motivo'):
+            lista_pedidos.append(f'  → Motivo: {producto_info["motivo"]}')
+    
 
     subject = 'Solicitud de Autorización de Pedido'
     message_admin = (
