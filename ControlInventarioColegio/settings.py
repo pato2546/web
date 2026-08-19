@@ -137,14 +137,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
+# Base de datos predeterminada (inicialmente vacía, se rellenará abajo)
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,  # Opcional: asocia una conexión persistente
-        ssl_require=True   # Requerido por Heroku en conexión segura
-    )
+    'default': {}
 }
 
+# Configuración principal desde DATABASE_URL (si está definida)
+DATABASES['default'] = dj_database_url.config(
+    default=os.environ.get('DATABASE_URL'),
+    conn_max_age=600,   # Opcional: conexiones persistentes
+    ssl_require=True      # Requerido por muchos entornos (p. ej. Heroku)
+)
+
+# Fallback a SQLite si DATABASE_URL no está definida
+if not os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
+    }
+ 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

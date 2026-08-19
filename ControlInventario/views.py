@@ -1,9 +1,14 @@
+import logging
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+<<<<<<< HEAD
+=======
+from django.db.models import Q
+>>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
 import pandas as pd
 from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
@@ -97,41 +102,42 @@ def pedidos_view(request):
 
 @login_required
 def realizar_pedido(request):
-    # GET: mostrar listado de productos ordenados alfabéticamente por nombre
     if request.method == 'GET':
-        # Ordenamos por nombre ascendente
-        productos = Producto.objects.filter(stock__gt=0).order_by('nombre').values(
-            'id', 'nombre', 'descripcion', 'stock'
-        )
-        # Si prefieres obtener objetos para usar en plantillas:
-        # productos = Producto.objects.all().order_by('nombre')
+        q = request.GET.get('q', '').strip()
+        productos_qs = Producto.objects.filter(stock__gt=0)
+        if q:
+            productos_qs = productos_qs.filter(
+                Q(nombre__icontains=q) | Q(descripcion__icontains=q)
+            )
+        productos = productos_qs.order_by('nombre').values('id', 'nombre', 'descripcion', 'stock')
         return render(request, 'controlinventario/hacer_pedido.html', {
-            'productos': productos
+            'productos': productos,
+            'query': q,
         })
 
-    # POST: procesar selección y guardarlo en la sesión para carro_view
     if request.method == 'POST':
         carrito = request.session.get('productos_seleccionados', [])
 
-        # Recorremos los campos POST para encontrar productos seleccionados
         for key, value in request.POST.items():
             if key.startswith('producto_') and value == 'on':
                 prod_id = key.split('_', 1)[1]
 
-                # Leer cantidad; si no está, usar 1
                 cantidad_str = request.POST.get(f'cantidad_{prod_id}', '1')
                 try:
                     cantidad = int(cantidad_str)
                 except ValueError:
                     cantidad = 1
 
+<<<<<<< HEAD
                 motivo = request.POST.get(f'motivo_{prod_id}', '').strip()
 
                 # Cargar el producto desde DB
+=======
+>>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
                 try:
                     producto = Producto.objects.get(id=prod_id)
                 except Producto.DoesNotExist:
-                    continue  # si no existe, saltar
+                    continue
 
                 carrito.append({
                     'id': str(prod_id),
@@ -141,13 +147,13 @@ def realizar_pedido(request):
                     'motivo': motivo,  # ← NUEVO: guardar motivo en sesión
                 })
 
-        # Guardar de nuevo en sesión
         request.session['productos_seleccionados'] = carrito
         request.session.modified = True
 
         messages.success(request, 'Productos agregados al carrito.')
-        return redirect('carro')  # Asegúrate de que la URL con name 'carro' apunta a carro_view
-
+        return redirect('carro')
+    
+    
 # Carrito de pedidos
 @login_required
 def carro_view(request):
@@ -237,26 +243,31 @@ def crear_pedido(request):
     return render(request, 'controlinventario/crear_pedido.html', {'productos': productos})
 
 # 2) Vista para confirmar el pedido
+
+logger = logging.getLogger(__name__)
+
 @login_required
 def confirmar_pedido(request):
     if request.method != 'POST':
         return redirect('hacer_pedido')  # o la ruta que uses para hacer_pedido
 
     productos_seleccionados = request.session.get('productos_seleccionados', [])
-    motivo = request.POST.get('motivo_pedido', '').strip()
 
     if not productos_seleccionados:
         messages.error(request, 'No se han seleccionado productos.')
         return redirect('hacer_pedido')
 
-    # Opción A: Crear un Pedido por ítem
+    # Construir y guardar pedidos en una transacción atómica
     lista_pedidos = []
-    for producto_info in productos_seleccionados:
-        try:
-            producto = Producto.objects.get(id=producto_info['id'])
-        except Producto.DoesNotExist:
-            continue
+    try:
+        with transaction.atomic():
+            for producto_info in productos_seleccionados:
+                try:
+                    producto = Producto.objects.get(id=producto_info['id'])
+                except Producto.DoesNotExist:
+                    continue
 
+<<<<<<< HEAD
         pedido = Pedido(
             usuario=request.user,
             producto=producto,
@@ -269,27 +280,50 @@ def confirmar_pedido(request):
         if producto_info.get('motivo'):
             lista_pedidos.append(f'  → Motivo: {producto_info["motivo"]}')
     
+=======
+                pedido = Pedido(
+                    usuario=request.user,
+                    producto=producto,
+                    cantidad=producto_info['cantidad'],
+                    autorizado=None
+                )
+                pedido.save()
+                lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
+    except Exception as e:
+        logger.exception("Error al crear pedidos en confirmar_pedido")
+        messages.error(request, 'Error al procesar el pedido. Por favor, intenta nuevamente.')
+        return redirect('carro')
+>>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
 
     subject = 'Solicitud de Autorización de Pedido'
     message_admin = (
         f'Se requiere autorización para el siguiente pedido realizado por {request.user.username}.\n'
         f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
     )
-    if motivo:
-        message_admin += f"\nMotivo de la solicitud:\n{motivo}"
 
-    send_mail(
-        subject,
-        message_admin,
-        settings.EMAIL_HOST_USER,
-        ['pedidocolegio@gmail.com'],  # ajusta destinatario
-        fail_silently=False,
-    )
+    # Enviar correo de autorización siempre (ya no depende de motivo)
+    try:
+        send_mail(
+            subject,
+            message_admin,
+            settings.EMAIL_HOST_USER,
+            ['pedidocolegio@gmail.com'],  # ajusta destinatario
+            fail_silently=False,
+        )
+    except Exception as e:
+        logger.exception("Error al enviar correo de autorización")
+        messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
+        return redirect('carro')
 
+    # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+
     # Limpiar el carrito tras confirmar
     request.session['productos_seleccionados'] = []
-    return redirect('pedidos')
+    request.session.modified = True
+
+    return redirect('carro')
+
 
 # Vista para exportar pedidos a Excel
 @login_required
@@ -342,7 +376,8 @@ def logout_view(request):
 @login_required
 def autorizar_pedido(request):
     # Filtramos los pedidos que no han sido aprobados ni rechazados
-    pedidos = Pedido.objects.filter(autorizado=False)  # Asegúrate que ‘autorizado’ esté como None para los pendientes
+    pedidos = Pedido.objects.filter(autorizado__isnull=True)
+    print(f"Pedidos pendientes: {pedidos.count()}")  # Asegúrate que ‘autorizado’ esté como None para los pendientes
 
     return render(request, 'controlinventario/autorizar_pedido.html', {'pedidos': pedidos})
 
@@ -361,10 +396,15 @@ def procesar_aprobacion(request):
                 producto = pedido.producto
 
                 if producto.stock >= pedido.cantidad:
-                    producto.stock -= pedido.cantidad
-                    producto.save()
+
+                     # Aprobar
                     pedido.autorizado = True
                     pedido.save()
+
+                    # Actualizar stock (si aplica)
+                    producto.stock -= pedido.cantidad
+                    producto.save()
+
                     messages.success(request, f"Pedido de {pedido.usuario.username} para {pedido.producto.nombre} autorizado.")
 
                     # Enviar correo al usuario
@@ -404,6 +444,7 @@ def procesar_rechazo(request):
             html_message = render_to_string('controlinventario/rechazar_pedido.html', {'pedido': pedido, 'motivo': motivo_rechazo})
             plain_message = strip_tags(html_message)  # Alternativa de texto plano para el correo
             send_mail(subject, plain_message, 'tu_email@gmail.com', [pedido.usuario.email], html_message=html_message)
+        
         except Pedido.DoesNotExist:
             messages.error(request, f"El pedido con ID {pedido_id} no existe.")
         

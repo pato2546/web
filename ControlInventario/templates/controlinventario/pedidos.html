@@ -84,6 +84,7 @@
                     <th>Cantidad</th>
                     <th>Cargo</th>
                     <th>Usuario</th>
+                    <th>Estatus</th>
                     <th>Fecha</th>
                     <th>Hora</th>
                 </tr>
@@ -96,6 +97,7 @@
                         <td>{{ pedido.cantidad }}</td>
                         <td>{{ pedido.cargo }}</td>
                         <td>{{ pedido.usuario.username }}</td>
+                        <td>{{ pedido.autorizado}}</td>
                         <td>{{ pedido.fecha|timezone:"America/Santiago"|date:"Y-m-d" }}</td>
                         <td>{{ pedido.fecha|timezone:"America/Santiago"|date:"H:i" }}</td>
                     </tr>

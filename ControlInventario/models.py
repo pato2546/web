@@ -27,7 +27,7 @@ class Pedido(models.Model):
     cantidad = models.PositiveIntegerField()
     motivo = models.TextField(blank=True, null=True)  # ← NUEVO CAMPO
     fecha = models.DateTimeField(auto_now_add=True)
-    autorizado = models.BooleanField(default=False)  # Campo agregado para autorización
+    autorizado = models.BooleanField(null=True, default=None)  # Campo agregado para autorización
     motivo_rechazo = models.TextField(null=True, blank=True)  # Campo para almacenar el motivo de rechazo
     
     
