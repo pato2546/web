@@ -5,10 +5,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-<<<<<<< HEAD
-=======
 from django.db.models import Q
->>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
 import pandas as pd
 from django.db import transaction
 from django.contrib.auth import logout, authenticate, login
@@ -31,7 +28,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirige a la vista 'home' después del login
+            return redirect('home')
         else:
             messages.error(request, 'Nombre de usuario o contraseña incorrectos.')
     return render(request, 'controlinventario/index.html')
@@ -45,7 +42,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)
             messages.success(request, 'Tu contraseña ha sido actualizada con éxito.')
-            return redirect('change_password')  # Redirige a la vista de cambio de contraseña
+            return redirect('change_password')
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'controlinventario/change_password.html', {'form': form})
@@ -128,12 +125,9 @@ def realizar_pedido(request):
                 except ValueError:
                     cantidad = 1
 
-<<<<<<< HEAD
+                # Leer motivo de la solicitud
                 motivo = request.POST.get(f'motivo_{prod_id}', '').strip()
 
-                # Cargar el producto desde DB
-=======
->>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
                 try:
                     producto = Producto.objects.get(id=prod_id)
                 except Producto.DoesNotExist:
@@ -144,7 +138,7 @@ def realizar_pedido(request):
                     'nombre': producto.nombre,
                     'descripcion': producto.descripcion,
                     'cantidad': cantidad,
-                    'motivo': motivo,  # ← NUEVO: guardar motivo en sesión
+                    'motivo': motivo,  # Guardar motivo en sesión
                 })
 
         request.session['productos_seleccionados'] = carrito
@@ -152,8 +146,7 @@ def realizar_pedido(request):
 
         messages.success(request, 'Productos agregados al carrito.')
         return redirect('carro')
-    
-    
+
 # Carrito de pedidos
 @login_required
 def carro_view(request):
@@ -173,7 +166,7 @@ def carro_view(request):
             nombre=item.get('nombre'),
             descripcion=item.get('descripcion'),
             cantidad=item.get('cantidad', 1),
-            motivo=item.get('motivo', ''),  # ← NUEVO
+            motivo=item.get('motivo', ''),
             stock=stock,
             stock_actual=stock_actual
         ))
@@ -181,8 +174,6 @@ def carro_view(request):
     return render(request, 'controlinventario/carrito.html', {
         'productos_seleccionados': items_obj
     })
-
-
 
 @require_POST
 @login_required
@@ -203,8 +194,6 @@ def eliminar_item_carro(request):
 
     messages.success(request, 'Producto eliminado del carro.')
     return redirect('carro')
-
-
 
 # Vista para crear un nuevo pedido
 @login_required
@@ -227,29 +216,28 @@ def crear_pedido(request):
         # Enviar correo al administrador
         subject = 'Nuevo Pedido Creado'
         html_message = render_to_string('controlinventario/nuevo_pedido.html', {'pedido': pedido})
-        plain_message = strip_tags(html_message)  # Alternativa de texto plano para el correo
+        plain_message = strip_tags(html_message)
         send_mail(
             subject,
             plain_message,
-            'tu_email@gmail.com',  # tu dirección de correo electrónico
-            ['admin@example.com'],  # dirección de correo del administrador
+            'tu_email@gmail.com',
+            ['admin@example.com'],
             html_message=html_message
         )
 
         messages.success(request, "Pedido creado exitosamente.")
-        return redirect('pedidos')  # Redirige a ver los pedidos
+        return redirect('pedidos')
 
     productos = Producto.objects.all()
     return render(request, 'controlinventario/crear_pedido.html', {'productos': productos})
 
-# 2) Vista para confirmar el pedido
-
+# Vista para confirmar el pedido
 logger = logging.getLogger(__name__)
 
 @login_required
 def confirmar_pedido(request):
     if request.method != 'POST':
-        return redirect('hacer_pedido')  # o la ruta que uses para hacer_pedido
+        return redirect('hacer_pedido')
 
     productos_seleccionados = request.session.get('productos_seleccionados', [])
 
@@ -267,33 +255,22 @@ def confirmar_pedido(request):
                 except Producto.DoesNotExist:
                     continue
 
-<<<<<<< HEAD
-        pedido = Pedido(
-            usuario=request.user,
-            producto=producto,
-            cantidad=producto_info['cantidad'],
-            motivo=producto_info.get('motivo', ''),  # ← NUEVO: asignar motivo
-            autorizado=False
-        )
-        pedido.save()
-        lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
-        if producto_info.get('motivo'):
-            lista_pedidos.append(f'  → Motivo: {producto_info["motivo"]}')
-    
-=======
+                # Crear pedido con motivo
                 pedido = Pedido(
                     usuario=request.user,
                     producto=producto,
                     cantidad=producto_info['cantidad'],
-                    autorizado=None
+                    motivo=producto_info.get('motivo', ''),
+                    autorizado=False
                 )
                 pedido.save()
                 lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
+                if producto_info.get('motivo'):
+                    lista_pedidos.append(f'  → Motivo: {producto_info["motivo"]}')
     except Exception as e:
         logger.exception("Error al crear pedidos en confirmar_pedido")
         messages.error(request, 'Error al procesar el pedido. Por favor, intenta nuevamente.')
         return redirect('carro')
->>>>>>> 3d9f7b5d77fc8c533ac98493a53b629e737a17c2
 
     subject = 'Solicitud de Autorización de Pedido'
     message_admin = (
@@ -301,13 +278,13 @@ def confirmar_pedido(request):
         f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
     )
 
-    # Enviar correo de autorización siempre (ya no depende de motivo)
+    # Enviar correo de autorización
     try:
         send_mail(
             subject,
             message_admin,
             settings.EMAIL_HOST_USER,
-            ['pedidocolegio@gmail.com'],  # ajusta destinatario
+            ['pedidocolegio@gmail.com'],
             fail_silently=False,
         )
     except Exception as e:
@@ -315,7 +292,6 @@ def confirmar_pedido(request):
         messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
         return redirect('carro')
 
-    # Mensaje de éxito y limpieza del carrito
     messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
 
     # Limpiar el carrito tras confirmar
@@ -323,7 +299,6 @@ def confirmar_pedido(request):
     request.session.modified = True
 
     return redirect('carro')
-
 
 # Vista para exportar pedidos a Excel
 @login_required
@@ -364,20 +339,18 @@ def exportar_a_excel(request):
     with pd.ExcelWriter(response, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Pedidos')
 
-    return response  # Mantiene el archivo siendo descargado
+    return response
 
 def logout_view(request):
     logout(request)
     messages.info(request, "Su cierre de sesión fue correcto.")
     return redirect('login')
 
-
-
 @login_required
 def autorizar_pedido(request):
     # Filtramos los pedidos que no han sido aprobados ni rechazados
     pedidos = Pedido.objects.filter(autorizado__isnull=True)
-    print(f"Pedidos pendientes: {pedidos.count()}")  # Asegúrate que ‘autorizado’ esté como None para los pendientes
+    print(f"Pedidos pendientes: {pedidos.count()}")
 
     return render(request, 'controlinventario/autorizar_pedido.html', {'pedidos': pedidos})
 
@@ -396,8 +369,7 @@ def procesar_aprobacion(request):
                 producto = pedido.producto
 
                 if producto.stock >= pedido.cantidad:
-
-                     # Aprobar
+                    # Aprobar
                     pedido.autorizado = True
                     pedido.save()
 
@@ -410,7 +382,7 @@ def procesar_aprobacion(request):
                     # Enviar correo al usuario
                     subject = 'Tu Pedido ha Sido Aprobado'
                     html_message = render_to_string('controlinventario/aprobacion_pedido.html', {'pedido': pedido})
-                    plain_message = strip_tags(html_message)  # Alternativa de texto plano para el correo
+                    plain_message = strip_tags(html_message)
                     send_mail(subject, plain_message, 'tu_email@gmail.com', [pedido.usuario.email], html_message=html_message)
                 else:
                     messages.error(request, f"No se puede aprobar el pedido de {pedido.producto.nombre} debido a stock insuficiente.")
@@ -442,7 +414,7 @@ def procesar_rechazo(request):
             # Enviar correo al usuario
             subject = 'Tu Pedido ha Sido Rechazado'
             html_message = render_to_string('controlinventario/rechazar_pedido.html', {'pedido': pedido, 'motivo': motivo_rechazo})
-            plain_message = strip_tags(html_message)  # Alternativa de texto plano para el correo
+            plain_message = strip_tags(html_message)
             send_mail(subject, plain_message, 'tu_email@gmail.com', [pedido.usuario.email], html_message=html_message)
         
         except Pedido.DoesNotExist:
