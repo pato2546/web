@@ -240,6 +240,7 @@ def confirmar_pedido(request):
         return redirect('hacer_pedido')
 
     productos_seleccionados = request.session.get('productos_seleccionados', [])
+    print(f"🔍 Productos en sesión: {len(productos_seleccionados)}")
 
     if not productos_seleccionados:
         messages.error(request, 'No se han seleccionado productos.')
@@ -264,6 +265,7 @@ def confirmar_pedido(request):
                     autorizado=False
                 )
                 pedido.save()
+                print(f"✅ Pedido guardado: ID={pedido.id}, Producto={producto.nombre}")  # ← Depuración
                 lista_pedidos.append(f'{producto.nombre} (Cantidad: {producto_info["cantidad"]})')
                 if producto_info.get('motivo'):
                     lista_pedidos.append(f'  → Motivo: {producto_info["motivo"]}')
@@ -278,6 +280,10 @@ def confirmar_pedido(request):
         f'Detalles del pedido:\n' + "\n".join(lista_pedidos)
     )
 
+    print(f"📧 Intentando enviar correo a: {settings.EMAIL_HOST_USER}")  # ← Depuración
+    print(f"   Asunto: {subject}")  # ← Depuración
+
+
     # Enviar correo de autorización
     try:
         send_mail(
@@ -287,7 +293,12 @@ def confirmar_pedido(request):
             ['pedidocolegio@gmail.com'],
             fail_silently=False,
         )
+
+        print("✅ CORREO ENVIADO EXITOSAMENTE")  # ← Depuración
+        messages.success(request, 'Se ha enviado una solicitud para la autorización del pedido al administrador.')
+
     except Exception as e:
+        print(f"❌ ERROR ENVIANDO CORREO: {type(e).__name__}: {e}")  # ← Depuración
         logger.exception("Error al enviar correo de autorización")
         messages.error(request, 'Error al enviar el correo de autorización. Por favor, intenta nuevamente más tarde.')
         return redirect('carro')
@@ -349,7 +360,7 @@ def logout_view(request):
 @login_required
 def autorizar_pedido(request):
     # Filtramos los pedidos que no han sido aprobados ni rechazados
-    pedidos = Pedido.objects.filter(autorizado__isnull=True)
+    pedidos = Pedido.objects.filter(autorizado__isnull=False)
     print(f"Pedidos pendientes: {pedidos.count()}")
 
     return render(request, 'controlinventario/autorizar_pedido.html', {'pedidos': pedidos})
