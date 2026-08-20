@@ -349,10 +349,21 @@ def logout_view(request):
 
 @login_required
 def autorizar_pedido(request):
-    # Filtramos los pedidos que no han sido aprobados ni rechazados
-    pedidos = Pedido.objects.filter(autorizado=False, motivo_rechazo__isnull=True)
-    print(f"Pedidos pendientes: {pedidos.count()}")  # Asegúrate que ‘autorizado’ esté como None para los pendientes
-
+    # Filtramos pedidos pendientes desde agosto 2026 en adelante
+    from datetime import datetime
+    from django.utils import timezone
+    
+    # Fecha límite: 1 de agosto de 2026
+    fecha_inicio = datetime(2026, 8, 1, tzinfo=timezone.get_current_timezone())
+    
+    pedidos = Pedido.objects.filter(
+        autorizado=False,
+        fecha__gte=fecha_inicio
+    ).filter(
+        Q(motivo_rechazo__isnull=True) | Q(motivo_rechazo='')
+    ).order_by('-fecha')  # Ordenar por fecha más reciente primero
+    
+    print(f"Pedidos pendientes desde agosto 2026: {pedidos.count()}")
     return render(request, 'controlinventario/autorizar_pedido.html', {'pedidos': pedidos})
 
 @login_required
