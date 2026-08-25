@@ -60,6 +60,7 @@
                         <th>Seleccionar</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
+                        <th>Motivo</th>
                         <th>Usuario</th>
                         <th>Fecha</th>
                         <th>Hora</th>
@@ -74,6 +75,7 @@
                             <td><label for="pedido_{{ pedido.id }}">{{ pedido.producto.nombre }}</label></td>
                             <td>{{ pedido.cantidad }}</td>
                             <td>{{ pedido.usuario.username }}</td>
+                            <td>{{ pedido.motivo_pedido|default:"Sin motivo especifico" }}</td>
                             <td>{{ pedido.fecha|date:"d/m/Y" }}</td>
                             <td>{{ pedido.fecha|date:"H:i" }}</td>
                         </tr>

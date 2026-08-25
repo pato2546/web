@@ -9,9 +9,9 @@ admin.site.site_title = _("Control Inventario")
 admin.site.index_title = _("Bienvenido al panel de control de inventario")
 
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'usuario', 'producto', 'cantidad', 'autorizado', 'motivo_rechazo')  # Muestra estos campos en la lista de pedidos
+    list_display = ('id', 'usuario', 'producto', 'cantidad', 'motivo_pedido','autorizado', 'motivo_rechazo')  # Muestra estos campos en la lista de pedidos
     list_filter = ('autorizado',)  # Permite filtrar por autorizado
-    search_fields = ('usuario__username', 'producto__nombre')  # Busca por nombre de usuario y producto
+    search_fields = ('usuario__username', 'producto__nombre','motivo_pedido')  # Busca por nombre de usuario y producto
 
 # Registro del modelo Pedido en el admin
 admin.site.register(Pedido, PedidoAdmin)
