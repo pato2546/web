@@ -24,7 +24,7 @@
 
     /* Contenedor de la tabla con scroll suave */
     .tabla-scroll {
-      max-height: 62vh;
+      max-height: 52vh;
       overflow: auto;
       border-radius: 6px;
       border: 1px solid #dee2e6;
@@ -106,9 +106,27 @@
       </div>
     </form>
 
-    <!-- Tabla de productos -->
+    <!-- Formulario de Pedido (POST) -->
     <form id="hacer-pedido-form" method="POST" action="{% url 'hacer_pedido' %}">
       {% csrf_token %}
+
+      <!-- Campo de Motivo/Justificación del Pedido -->
+      <div class="card mb-3 shadow-sm border-secondary">
+        <div class="card-body bg-light">
+          <label for="motivo_pedido" class="form-label font-weight-bold text-dark">
+            Motivo / Justificación del Pedido:
+          </label>
+          <textarea 
+            name="motivo_pedido" 
+            id="motivo_pedido" 
+            class="form-control" 
+            rows="2" 
+            placeholder="Ingrese el motivo de la solicitud (ej. Material para clases de arte, insumos de oficina...)" 
+            required></textarea>
+        </div>
+      </div>
+
+      <!-- Tabla de productos -->
       <div class="tabla-scroll">
         <table class="table table-striped table-bordered w-100" id="tabla-productos">
           <thead class="thead-dark">

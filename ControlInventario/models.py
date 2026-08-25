@@ -28,6 +28,8 @@ class Pedido(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     autorizado = models.BooleanField(null=True, default=None)  # Campo agregado para autorización
     motivo_rechazo = models.TextField(null=True, blank=True)  # Campo para almacenar el motivo de rechazo
+    motivo_pedido = models.TextField(null=True, blank=True)  # Campo nuevo
+    
     
     
     def __str__(self):
