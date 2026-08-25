@@ -74,8 +74,8 @@
                             </td>
                             <td><label for="pedido_{{ pedido.id }}">{{ pedido.producto.nombre }}</label></td>
                             <td>{{ pedido.cantidad }}</td>
-                            <td>{{ pedido.usuario.username }}</td>
                             <td>{{ pedido.motivo_pedido|default:"Sin motivo especifico" }}</td>
+                            <td>{{ pedido.usuario.username }}</td>                            
                             <td>{{ pedido.fecha|date:"d/m/Y" }}</td>
                             <td>{{ pedido.fecha|date:"H:i" }}</td>
                         </tr>
